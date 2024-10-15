@@ -32,6 +32,7 @@
         .progress-fill {
             height: 100%;
             background-color: #76c7c0;
+            width: 0; /* Start with 0% width */
         }
         .hidden {
             display: none;
@@ -74,22 +75,17 @@
         <div id="match-items"></div>
     </div>
     <div id="badges-container"></div>
-    <audio id="correct-sound" src="url_del_sonido_correcto.mp3"></audio>
-    <audio id="incorrect-sound" src="url_del_sonido_incorrecto.mp3"></audio>
+    <audio id="correct-sound" src="https://www.soundjay.com/button/sounds/button-3.mp3"></audio>
+    <audio id="incorrect-sound" src="https://www.soundjay.com/button/sounds/button-6.mp3"></audio>
     <button onclick="resetGame()">Reiniciar Juego</button>
 
     <script>
         const beadsColors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FFD733', '#33FFD7', '#FF8C33', '#33FF8C', '#FF3375', '#FF33B5'];
         const totalBeads = 10; // Total beads for the rosary
-        const prayers = [
-            "Padre Nuestro", "Ave María", "Gloria",
-            "Misterio Gozoso", "Misterio Doloroso",
-            "Misterio Glorioso", "Misterio Luminoso"
-        ];
         let completedBeads = 0;
         let achievements = [];
-        let currentActivity = 0;
 
+        // Function to create beads
         function createBeads() {
             const rosaryContainer = document.getElementById('rosary-container');
             rosaryContainer.innerHTML = '';
@@ -102,6 +98,7 @@
             }
         }
 
+        // Function to show prayer activity
         function showPrayerActivity(index) {
             completedBeads++;
             updateProgress((completedBeads / totalBeads) * 100);
@@ -141,13 +138,15 @@
             }
         }
 
+        // Function to display prayer
         function displayPrayer(prayer) {
             document.getElementById('text-rosary').innerText = prayer;
             document.getElementById('gif-container').classList.remove('hidden');
-            document.getElementById('gif').src = "url_del_gif_de_oracion"; // Replace with appropriate GIF
+            document.getElementById('gif').src = "https://media.giphy.com/media/xT0xeE1v3Lxtv5Li4c/giphy.gif"; // Replace with an appropriate GIF
             document.getElementById('correct-sound').play();
         }
 
+        // Function for fill in the blanks activity
         function fillInTheBlanks() {
             const blanks = "Padre ___, que estás en los cielos.";
             const userInput = prompt(Completa la oración: ${blanks});
@@ -160,6 +159,7 @@
             }
         }
 
+        // Function to show trivia question
         function showTrivia() {
             const questions = [
                 { question: "¿Cuántos misterios hay en el Rosario?", options: ["10", "15", "20"], answer: "15" },
@@ -188,11 +188,12 @@
             document.getElementById('quiz-container').classList.remove('hidden');
         }
 
+        // Function to show match game
         function showMatchGame() {
             const pairs = [
-                { name: "Padre Nuestro", image: "url_del_imagen_padre_nuestro" },
-                { name: "Ave María", image: "url_del_imagen_ave_maria" },
-                { name: "Gloria", image: "url_del_imagen_gloria" }
+                { name: "Padre Nuestro", image: "https://example.com/padre_nuestro.png" }, // Replace with actual image URL
+                { name: "Ave María", image: "https://example.com/ave_maria.png" }, // Replace with actual image URL
+                { name: "Gloria", image: "https://example.com/gloria.png" } // Replace with actual image URL
             ];
             const items = pairs.concat(pairs).sort(() => Math.random() - 0.5); // Shuffle items
             const matchItemsContainer = document.getElementById('match-items');
@@ -212,11 +213,13 @@
             // Logic to check if the selected item matches with its pair
         }
 
+        // Function to show quick facts
         function quickFacts() {
             alert("El Rosario es una oración muy antigua que se remonta a los siglos XII y XIII.");
             document.getElementById('correct-sound').play();
         }
 
+        // Function to show true/false question
         function showTrueFalse() {
             const fact = "¿Es el Rosario solo para los católicos?";
             const userAnswer = confirm(fact + "\n(Aceptar: Verdadero, Cancelar: Falso)");
@@ -229,16 +232,19 @@
             }
         }
 
+        // Function to allow coloring the bead
         function colorTheBead() {
-            alert("El color del rosario puede representar diferentes aspectos espirituales. Elige un color.");
+            alert("Reflexiona sobre el significado espiritual de los colores.");
             document.getElementById('correct-sound').play();
         }
 
+        // Function for community prayer
         function prayTogether() {
             alert("¡Reza juntos! Aquí es donde puedes compartir tus intenciones.");
             document.getElementById('correct-sound').play();
         }
 
+        // Function to unlock achievements
         function unlockAchievement(achievement) {
             achievements.push(achievement);
             alert(achievement);
@@ -246,10 +252,12 @@
             document.getElementById('correct-sound').play();
         }
 
+        // Function to update progress
         function updateProgress(percentage) {
             document.getElementById('progress-fill').style.width = percentage + '%';
         }
 
+        // Function to reset the game
         function resetGame() {
             completedBeads = 0;
             achievements = [];
@@ -262,6 +270,7 @@
             updateProgress(0);
         }
 
+        // Initialize the game
         createBeads();
     </script>
 </body>
