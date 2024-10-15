@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego del Rosario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        .bead {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 5px;
+            cursor: pointer;
+            border: 2px solid #000;
+        }
+        .completed {
+            opacity: 0.5;
+        }
+        .progress {
+            width: 100%;
+            height: 20px;
+            background-color: #ddd;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #76c7c0;
+        }
+        .hidden {
+            display: none;
+        }
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #000;
+            z-index: 1000;
+        }
+        .quiz-option, .match-item {
+            cursor: pointer;
+            margin: 5px;
+            padding: 10px;
+            background-color: #76c7c0;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Juego del Rosario</h1>
+    <div id="rosary-container"></div>
+    <div class="progress">
+        <div id="progress-fill" class="progress-fill"></div>
+    </div>
+    <div id="text-rosary"></div>
+    <div id="gif-container" class="hidden">
+        <img id="gif" src="" alt="GIF" />
+    </div>
+    <div id="quiz-container" class="hidden">
+        <div id="quiz-question"></div>
+        <div id="quiz-options"></div>
+    </div>
+    <div class="match-game hidden">
+        <div id="match-items"></div>
+    </div>
+    <div id="badges-container"></div>
+    <audio id="correct-sound" src="url_del_sonido_correcto.mp3"></audio>
+    <audio id="incorrect-sound" src="url_del_sonido_incorrecto.mp3"></audio>
+    <button onclick="resetGame()">Reiniciar Juego</button>
+
+    <script>
+        const beadsColors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FFD733', '#33FFD7', '#FF8C33', '#33FF8C', '#FF3375', '#FF33B5'];
+        const totalBeads = 10; // Total beads for the rosary
+        const prayers = [
+            "Padre Nuestro", "Ave María", "Gloria",
+            "Misterio Gozoso", "Misterio Doloroso",
+            "Misterio Glorioso", "Misterio Luminoso"
+        ];
+        let completedBeads = 0;
+        let achievements = [];
+        let currentActivity = 0;
+
+        function createBeads() {
+            const rosaryContainer = document.getElementById('rosary-container');
+            rosaryContainer.innerHTML = '';
+            for (let i = 0; i < totalBeads; i++) {
+                const bead = document.createElement('div');
+                bead.className = 'bead';
+                bead.style.backgroundColor = beadsColors[i % beadsColors.length];
+                bead.onclick = () => showPrayerActivity(i);
+                rosaryContainer.appendChild(bead);
+            }
+        }
+
+        function showPrayerActivity(index) {
+            completedBeads++;
+            updateProgress((completedBeads / totalBeads) * 100);
+            document.querySelectorAll('.bead')[index].classList.add('completed');
+
+            switch (index) {
+                case 0:
+                    displayPrayer("Padre Nuestro");
+                    break;
+                case 1:
+                    fillInTheBlanks();
+                    break;
+                case 2:
+                    showTrivia();
+                    break;
+                case 3:
+                    showMatchGame();
+                    break;
+                case 4:
+                    quickFacts();
+                    break;
+                case 5:
+                    displayPrayer("Ave María");
+                    break;
+                case 6:
+                    showTrueFalse();
+                    break;
+                case 7:
+                    colorTheBead();
+                    break;
+                case 8:
+                    prayTogether();
+                    break;
+                case 9:
+                    unlockAchievement("¡Logro Completo! Has terminado el Rosario.");
+                    break;
+            }
+        }
+
+        function displayPrayer(prayer) {
+            document.getElementById('text-rosary').innerText = prayer;
+            document.getElementById('gif-container').classList.remove('hidden');
+            document.getElementById('gif').src = "url_del_gif_de_oracion"; // Replace with appropriate GIF
+            document.getElementById('correct-sound').play();
+        }
+
+        function fillInTheBlanks() {
+            const blanks = "Padre ___, que estás en los cielos.";
+            const userInput = prompt(Completa la oración: ${blanks});
+            if (userInput && userInput.toLowerCase() === 'nuestro') {
+                alert("¡Correcto!");
+                document.getElementById('correct-sound').play();
+            } else {
+                alert("Incorrecto. La respuesta correcta es: Nuestro.");
+                document.getElementById('incorrect-sound').play();
+            }
+        }
+
+        function showTrivia() {
+            const questions = [
+                { question: "¿Cuántos misterios hay en el Rosario?", options: ["10", "15", "20"], answer: "15" },
+                { question: "¿Cuál es el misterio de la Anunciación?", options: ["Gozosos", "Dolorosos", "Gloriosos"], answer: "Gozosos" }
+            ];
+            const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+            document.getElementById('quiz-question').innerText = randomQuestion.question;
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            randomQuestion.options.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'quiz-option';
+                optionElement.innerText = option;
+                optionElement.onclick = () => {
+                    if (option === randomQuestion.answer) {
+                        alert("¡Correcto!");
+                        document.getElementById('correct-sound').play();
+                    } else {
+                        alert("Incorrecto, la respuesta correcta es: " + randomQuestion.answer);
+                        document.getElementById('incorrect-sound').play();
+                    }
+                    document.getElementById('quiz-container').classList.add('hidden');
+                };
+                optionsContainer.appendChild(optionElement);
+            });
+            document.getElementById('quiz-container').classList.remove('hidden');
+        }
+
+        function showMatchGame() {
+            const pairs = [
+                { name: "Padre Nuestro", image: "url_del_imagen_padre_nuestro" },
+                { name: "Ave María", image: "url_del_imagen_ave_maria" },
+                { name: "Gloria", image: "url_del_imagen_gloria" }
+            ];
+            const items = pairs.concat(pairs).sort(() => Math.random() - 0.5); // Shuffle items
+            const matchItemsContainer = document.getElementById('match-items');
+            matchItemsContainer.innerHTML = '';
+            items.forEach(item => {
+                const matchItem = document.createElement('div');
+                matchItem.className = 'match-item';
+                matchItem.innerText = item.name;
+                matchItem.onclick = () => handleMatch(item.name);
+                matchItemsContainer.appendChild(matchItem);
+            });
+            document.querySelector('.match-game').classList.remove('hidden');
+        }
+
+        function handleMatch(selectedItem) {
+            alert("Seleccionaste: " + selectedItem);
+            // Logic to check if the selected item matches with its pair
+        }
+
+        function quickFacts() {
+            alert("El Rosario es una oración muy antigua que se remonta a los siglos XII y XIII.");
+            document.getElementById('correct-sound').play();
+        }
+
+        function showTrueFalse() {
+            const fact = "¿Es el Rosario solo para los católicos?";
+            const userAnswer = confirm(fact + "\n(Aceptar: Verdadero, Cancelar: Falso)");
+            if (userAnswer) {
+                alert("Incorrecto. El Rosario es también apreciado en otras tradiciones.");
+                document.getElementById('incorrect-sound').play();
+            } else {
+                alert("¡Correcto! No es exclusivo de los católicos.");
+                document.getElementById('correct-sound').play();
+            }
+        }
+
+        function colorTheBead() {
+            alert("El color del rosario puede representar diferentes aspectos espirituales. Elige un color.");
+            document.getElementById('correct-sound').play();
+        }
+
+        function prayTogether() {
+            alert("¡Reza juntos! Aquí es donde puedes compartir tus intenciones.");
+            document.getElementById('correct-sound').play();
+        }
+
+        function unlockAchievement(achievement) {
+            achievements.push(achievement);
+            alert(achievement);
+            document.getElementById('badges-container').innerText = achievements.join(', ');
+            document.getElementById('correct-sound').play();
+        }
+
+        function updateProgress(percentage) {
+            document.getElementById('progress-fill').style.width = percentage + '%';
+        }
+
+        function resetGame() {
+            completedBeads = 0;
+            achievements = [];
+            createBeads();
+            document.getElementById('text-rosary').innerText = '';
+            document.getElementById('gif-container').classList.add('hidden');
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.querySelector('.match-game').classList.add('hidden');
+            document.getElementById('badges-container').innerText = '';
+            updateProgress(0);
+        }
+
+        createBeads();
+    </script>
+</body>
+</html>
