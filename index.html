@@ -3,23 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rosary Game</title>
+    <title>Interactive Rosary Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f3f4f6;
             text-align: center;
+            overflow: hidden;
         }
         #rosary-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            border-radius: 50%;
             display: flex;
-            justify-content: center;
             flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 30px;
+            justify-content: center;
+            align-items: center;
+            transform: rotate(-18deg); /* Offset for circular alignment */
         }
         .bead {
-            width: 30px;
-            height: 30px;
+            position: absolute;
+            width: 25px;
+            height: 25px;
             border-radius: 50%;
             background-color: #666;
             cursor: pointer;
@@ -28,16 +35,10 @@
         .bead.clicked {
             background-color: #2196F3;
         }
-        .decade-separator {
-            width: 40px;
-            height: 10px;
-            background-color: #333;
-            margin: 10px;
-        }
         #controls {
             margin-top: 20px;
         }
-        #current-prayer {
+        #current-prayer, #activity {
             font-size: 1.2em;
             margin-top: 15px;
         }
@@ -45,11 +46,9 @@
 </head>
 <body>
     <h1>Interactive Rosary Game</h1>
-    <p>Click on each bead to pray and progress through the Rosary.</p>
+    <p>Click on each bead to pray and complete activities.</p>
 
-    <div id="rosary-container">
-        <!-- 5 decades with 10 beads each and separators -->
-    </div>
+    <div id="rosary-container"></div>
 
     <div id="controls">
         <button onclick="resetRosary()">Reset Rosary</button>
@@ -57,6 +56,7 @@
     </div>
 
     <div id="current-prayer">Click a bead to start</div>
+    <div id="activity">Activity: Ready to start?</div>
 
     <!-- Audio files -->
     <audio id="our-father" src="our_father.mp3"></audio>
@@ -72,46 +72,62 @@
             { type: "Glory Be", sound: "glory-be" }
         ];
 
+        const activities = [
+            "Reflect on the virtue of patience.",
+            "Pray for a loved one.",
+            "Think of one thing you're grateful for.",
+            "Say a silent prayer for peace.",
+            "Pray for those in need.",
+            "Focus on a personal goal.",
+            "Reflect on forgiveness.",
+            "Pray for strength.",
+            "Express a hope for the future.",
+            "Reflect on an act of kindness."
+        ];
+
         let currentDecade = 0;
         const totalDecades = 5;
         let backgroundMusicPlaying = false;
 
         const rosaryContainer = document.getElementById("rosary-container");
         const currentPrayerDisplay = document.getElementById("current-prayer");
+        const activityDisplay = document.getElementById("activity");
 
         function createRosary() {
-            for (let decade = 0; decade < totalDecades; decade++) {
-                const decadeContainer = document.createElement("div");
-                decadeContainer.classList.add("decade");
+            const totalBeads = prayers.length * totalDecades;
+            for (let i = 0; i < totalBeads; i++) {
+                const bead = document.createElement("div");
+                bead.classList.add("bead");
+                
+                // Position the beads in a circular pattern
+                const angle = (i / totalBeads) * 2 * Math.PI;
+                const radius = 150;
+                const x = 200 + radius * Math.cos(angle);
+                const y = 200 + radius * Math.sin(angle);
+                bead.style.left = `${x}px`;
+                bead.style.top = `${y}px`;
 
-                prayers.forEach(prayer => {
-                    const bead = document.createElement("div");
-                    bead.classList.add("bead");
-                    bead.onclick = () => playPrayer(prayer, bead);
-                    decadeContainer.appendChild(bead);
-                });
-
-                rosaryContainer.appendChild(decadeContainer);
-
-                if (decade < totalDecades - 1) {
-                    const separator = document.createElement("div");
-                    separator.classList.add("decade-separator");
-                    rosaryContainer.appendChild(separator);
-                }
+                bead.onclick = () => playPrayerAndActivity(i % prayers.length, bead);
+                rosaryContainer.appendChild(bead);
             }
         }
 
-        function playPrayer(prayer, bead) {
+        function playPrayerAndActivity(prayerIndex, bead) {
             if (!bead.classList.contains("clicked")) {
                 bead.classList.add("clicked");
+                const prayer = prayers[prayerIndex];
                 playSound(prayer.sound);
                 currentPrayerDisplay.textContent = `Praying: ${prayer.type}`;
                 
+                // Show a random activity
+                const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+                activityDisplay.textContent = `Activity: ${randomActivity}`;
+
                 // Check if the decade is complete
                 if (isDecadeComplete()) {
                     currentDecade++;
                     if (currentDecade < totalDecades) {
-                        playSound("chime");  // Transition sound
+                        playSound("chime");
                         alert(`Decade ${currentDecade} complete!`);
                     } else {
                         alert("Rosary Complete! Well done!");
@@ -122,8 +138,10 @@
         }
 
         function isDecadeComplete() {
-            const decadeBeads = rosaryContainer.querySelectorAll(".decade:nth-child(" + (currentDecade * 2 + 1) + ") .bead");
-            return Array.from(decadeBeads).every(bead => bead.classList.contains("clicked"));
+            const beads = rosaryContainer.querySelectorAll(".bead");
+            const start = currentDecade * prayers.length;
+            const end = start + prayers.length;
+            return Array.from(beads).slice(start, end).every(bead => bead.classList.contains("clicked"));
         }
 
         function playSound(soundId) {
@@ -138,6 +156,7 @@
             document.querySelectorAll(".bead").forEach(bead => bead.classList.remove("clicked"));
             currentDecade = 0;
             currentPrayerDisplay.textContent = "Click a bead to start";
+            activityDisplay.textContent = "Activity: Ready to start?";
         }
 
         function toggleBackgroundMusic() {
