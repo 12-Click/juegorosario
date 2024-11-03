@@ -14,7 +14,7 @@
         #rosary-container {
             position: relative;
             width: 420px;
-            height: 420px;
+            height: 500px;
             margin: 0 auto;
             border-radius: 50%;
             display: flex;
@@ -41,6 +41,32 @@
         #current-prayer, #activity {
             font-size: 1.2em;
             margin-top: 15px;
+        }
+        .cross {
+            width: 40px;
+            height: 60px;
+            position: absolute;
+            background-color: #333;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .cross::before, .cross::after {
+            content: '';
+            position: absolute;
+            background-color: #333;
+        }
+        .cross::before {
+            width: 20px;
+            height: 10px;
+            top: 25px;
+            left: 10px;
+        }
+        .cross::after {
+            height: 10px;
+            width: 20px;
+            top: 35px;
+            left: 10px;
         }
     </style>
 </head>
@@ -97,17 +123,15 @@
             const totalBeads = prayers.length * totalDecades;
             const radius = 170; // Adjusted radius for spacing
 
+            // Main rosary circle
             for (let i = 0; i < totalBeads; i++) {
                 const bead = document.createElement("div");
                 bead.classList.add("bead");
-                
-                // Determine position angle
+
                 const angle = (i / totalBeads) * 2 * Math.PI;
-                
-                // Adjust for larger spaces between decades
                 const isDecadeSeparator = i % prayers.length === 0;
                 const adjustedRadius = isDecadeSeparator ? radius + 15 : radius;
-                
+
                 const x = 210 + adjustedRadius * Math.cos(angle);
                 const y = 210 + adjustedRadius * Math.sin(angle);
                 bead.style.left = `${x}px`;
@@ -116,20 +140,36 @@
                 bead.onclick = () => playPrayerAndActivity(i % prayers.length, bead);
                 rosaryContainer.appendChild(bead);
             }
+
+            // Connector beads leading to the cross
+            const connectorBeadCount = 5;
+            const connectorYOffset = 45; // Distance between each connector bead
+
+            for (let j = 1; j <= connectorBeadCount; j++) {
+                const connectorBead = document.createElement("div");
+                connectorBead.classList.add("bead");
+                connectorBead.style.left = "195px"; // Center align connector beads
+                connectorBead.style.top = `${360 + j * connectorYOffset}px`;
+                connectorBead.onclick = () => playPrayerAndActivity(j, connectorBead);
+                rosaryContainer.appendChild(connectorBead);
+            }
+
+            // Cross element
+            const cross = document.createElement("div");
+            cross.classList.add("cross");
+            rosaryContainer.appendChild(cross);
         }
 
         function playPrayerAndActivity(prayerIndex, bead) {
             if (!bead.classList.contains("clicked")) {
                 bead.classList.add("clicked");
-                const prayer = prayers[prayerIndex];
+                const prayer = prayers[prayerIndex] || { type: "Meditation", sound: "our-father" };
                 playSound(prayer.sound);
                 currentPrayerDisplay.textContent = `Praying: ${prayer.type}`;
                 
-                // Show a random activity
                 const randomActivity = activities[Math.floor(Math.random() * activities.length)];
                 activityDisplay.textContent = `Activity: ${randomActivity}`;
 
-                // Check if the decade is complete
                 if (isDecadeComplete()) {
                     currentDecade++;
                     if (currentDecade < totalDecades) {
@@ -176,7 +216,6 @@
             }
         }
 
-        // Initialize the Rosary on page load
         createRosary();
     </script>
 </body>
