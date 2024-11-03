@@ -14,7 +14,7 @@
         #rosary-container {
             position: relative;
             width: 420px;
-            height: 500px;
+            height: 520px;
             margin: 0 auto;
             border-radius: 50%;
             display: flex;
@@ -52,33 +52,24 @@
         /* Cross styling */
         .cross {
             position: absolute;
-            bottom: -60px;
+            width: 20px;
+            height: 60px;
+            background-color: #8b4513; /* Dark brown for the cross */
+            bottom: -90px;
             left: 50%;
-            width: 50px;
-            height: 80px;
-            background-color: #444;
             transform: translateX(-50%);
             border-radius: 5px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
         }
-        .cross::before, .cross::after {
+        .cross::before {
             content: '';
             position: absolute;
-            background-color: #444;
-            border-radius: 3px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-        }
-        .cross::before {
             width: 50px;
             height: 15px;
-            top: 30px;
-            left: -25px;
-        }
-        .cross::after {
-            height: 15px;
-            width: 50px;
-            bottom: 30px;
-            left: -25px;
+            background-color: #8b4513;
+            top: 20px;
+            left: -15px;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -133,7 +124,7 @@
 
         function createRosary() {
             const totalBeads = prayers.length * totalDecades;
-            const radius = 180; // Adjusted radius for spacing
+            const radius = 180;
 
             // Main rosary circle
             for (let i = 0; i < totalBeads; i++) {
@@ -156,15 +147,19 @@
                 rosaryContainer.appendChild(bead);
             }
 
-            // Connector beads leading to the cross
+            // Connector beads leading to the cross in a slight curve
             const connectorBeadCount = 5;
             const connectorYOffset = 50; // Distance between each connector bead
+            const curveRadius = 15; // Adjust for a slight curve
 
             for (let j = 1; j <= connectorBeadCount; j++) {
                 const connectorBead = document.createElement("div");
                 connectorBead.classList.add("bead");
-                connectorBead.style.left = "195px";
-                connectorBead.style.top = `${380 + j * connectorYOffset}px`;
+                const angleOffset = (j - 3) * 0.1; // Creates slight curve
+                const x = 210 + curveRadius * Math.sin(angleOffset);
+                const y = 360 + j * connectorYOffset;
+                connectorBead.style.left = `${x}px`;
+                connectorBead.style.top = `${y}px`;
                 connectorBead.onclick = () => playPrayerAndActivity(j, connectorBead);
                 rosaryContainer.appendChild(connectorBead);
             }
