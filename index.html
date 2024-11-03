@@ -13,8 +13,8 @@
         }
         #rosary-container {
             position: relative;
-            width: 400px;
-            height: 400px;
+            width: 420px;
+            height: 420px;
             margin: 0 auto;
             border-radius: 50%;
             display: flex;
@@ -25,8 +25,8 @@
         }
         .bead {
             position: absolute;
-            width: 25px;
-            height: 25px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             background-color: #666;
             cursor: pointer;
@@ -95,15 +95,21 @@
 
         function createRosary() {
             const totalBeads = prayers.length * totalDecades;
+            const radius = 170; // Adjusted radius for spacing
+
             for (let i = 0; i < totalBeads; i++) {
                 const bead = document.createElement("div");
                 bead.classList.add("bead");
                 
-                // Position the beads in a circular pattern
+                // Determine position angle
                 const angle = (i / totalBeads) * 2 * Math.PI;
-                const radius = 150;
-                const x = 200 + radius * Math.cos(angle);
-                const y = 200 + radius * Math.sin(angle);
+                
+                // Adjust for larger spaces between decades
+                const isDecadeSeparator = i % prayers.length === 0;
+                const adjustedRadius = isDecadeSeparator ? radius + 15 : radius;
+                
+                const x = 210 + adjustedRadius * Math.cos(angle);
+                const y = 210 + adjustedRadius * Math.sin(angle);
                 bead.style.left = `${x}px`;
                 bead.style.top = `${y}px`;
 
