@@ -3,150 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Christmas Gift Hunt</title>
+    <title>Christmas Village Game</title>
     <style>
         body {
-            background-color: #f0f8ff;
-            font-family: 'Arial', sans-serif;
-        }
-
-        #game-container {
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        #game-area {
-            width: 600px;
-            height: 400px;
-            border: 2px solid #ccc;
-            position: relative;
+            margin: 0;
             overflow: hidden;
-            background-image: url('snow-background.png'); /* Use a festive background image */
-            background-size: cover;
+            font-family: Arial, sans-serif;
         }
 
-        .gift {
-            width: 30px;
-            height: 30px;
-            background-image: url('gift.png'); /* Use a gift image */
-            background-size: cover;
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #triviaPopup {
             position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
         }
 
-        .obstacle {
-            width: 50px;
-            height: 50px;
-            background-color: red; /* Use a festive obstacle */
-            position: absolute;
+        .hidden {
+            display: none;
         }
 
-        #score, #timer {
-            font-size: 24px;
-            margin: 10px 0;
+        .popup-content {
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <h1>Christmas Gift Hunt</h1>
-        <div id="score">Score: 0</div>
-        <div id="timer">Time: 30</div>
-        <button id="start-button">Start Game</button>
-        <div id="game-area"></div>
+    <div id="gameContainer"></div>
+    <div id="triviaPopup" class="hidden">
+        <div class="popup-content">
+            <h2>Trivia Question</h2>
+            <p id="triviaQuestion"></p>
+            <input type="text" id="triviaAnswer" placeholder="Your answer here">
+            <button id="submitAnswer">Submit</button>
+        </div>
     </div>
-    <audio id="collect-sound" src="collect.mp3"></audio>
-    <audio id="game-over-sound" src="game-over.mp3"></audio>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let score = 0;
-        let timeLeft = 30;
-        let timer;
-        const gameArea = document.getElementById('game-area');
-        const scoreDisplay = document.getElementById('score');
-        const timerDisplay = document.getElementById('timer');
-        const startButton = document.getElementById('start-button');
-        const collectSound = document.getElementById('collect-sound');
-        const gameOverSound = document.getElementById('game-over-sound');
+        let scene, camera, renderer;
+        let road, houses = [];
+        let currentHouseIndex = 0;
+        const triviaQuestions = [
+            { question: "What is the name of Santa's reindeer?", answer: "Rudolph" },
+            { question: "In which country is the tradition of the Advent calendar believed to have started?", answer: "Germany" },
+            { question: "What do people traditionally put on top of a Christmas tree?", answer: "Star" }
+        ];
 
-        startButton.addEventListener('click', startGame);
+        function init() {
+            // Scene setup
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('gameContainer').appendChild(renderer.domElement);
 
-        function startGame() {
-            score = 0;
-            timeLeft = 30; // Reset time
-            scoreDisplay.innerText = `Score: ${score}`;
-            timerDisplay.innerText = `Time: ${timeLeft}`;
-            gameArea.innerHTML = ''; // Clear previous game area
-            generateGifts();
-            startTimer();
+            // Road creation
+            createRoad();
+
+            // House creation
+            createHouses();
+
+            camera.position.z = 5;
+
+            // Animation loop
+            animate();
         }
 
-        function startTimer() {
-            timer = setInterval(() => {
-                timeLeft--;
-                timerDisplay.innerText = `Time: ${timeLeft}`;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    endGame();
-                }
-            }, 1000);
+        function createRoad() {
+            const geometry = new THREE.PlaneGeometry(10, 100);
+            const textureLoader = new THREE.TextureLoader();
+            const roadTexture = textureLoader.load('images/road.gif'); // Replace with your road GIF path
+            const material = new THREE.MeshBasicMaterial({ map: roadTexture });
+            road = new THREE.Mesh(geometry, material);
+            road.rotation.x = -Math.PI / 2;
+            scene.add(road);
         }
 
-        function endGame() {
-            gameOverSound.play();
-            alert(`Game Over! Your final score is: ${score}`);
-            startButton.disabled = false; // Enable the start button for a new game
-        }
+        function createHouses() {
+            const houseImages = [
+                'images/house1.png', // Replace with your house image paths
+                'images/house2.png',
+                'images/house3.png'
+            ];
 
-        function generateGifts() {
-            const gift = document.createElement('div');
-            gift.className = 'gift';
-            gift.style.top = Math.random() * (gameArea.clientHeight - 30) + 'px';
-            gift.style.left = Math.random() * (gameArea.clientWidth - 30) + 'px';
-            gameArea.appendChild(gift);
-            
-            gift.addEventListener('click', function() {
-                score++;
-                collectSound.play();
-                scoreDisplay.innerText = `Score: ${score}`;
-                gameArea.removeChild(gift);
-                generateGifts(); // Generate new gift after collection
-                if (score % 5 === 0) { // Increase difficulty every 5 gifts
-                    generateObstacles();
-                }
-            });
-        }
-
-        function generateObstacles() {
-            const obstacle = document.createElement('div');
-            obstacle.className = 'obstacle';
-            obstacle.style.top = Math.random() * (gameArea.clientHeight - 50) + 'px';
-            obstacle.style.left = Math.random() * (gameArea.clientWidth - 50) + 'px';
-            gameArea.appendChild(obstacle);
-            
-            obstacle.addEventListener('click', function() {
-                alert('Game Over! You hit an obstacle.');
-                endGame();
-            });
-        }
-
-        // Optional: Add touch events for mobile devices
-        if ('ontouchstart' in window) {
-            gameArea.addEventListener('touchstart', function(event) {
-                const touch = event.touches[0];
-                checkHit(touch.clientX, touch.clientY);
-            });
-        }
-
-        function checkHit(x, y) {
-            const gifts = document.getElementsByClassName('gift');
-            for (let gift of gifts) {
-                const rect = gift.getBoundingClientRect();
-                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                    gift.click();
-                    return;
-                }
+            for (let i = 0; i < triviaQuestions.length; i++) {
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const textureLoader = new THREE.TextureLoader();
+                const houseTexture = textureLoader.load(houseImages[i]);
+                const material = new THREE.MeshBasicMaterial({ map: houseTexture });
+                const house = new THREE.Mesh(geometry, material);
+                house.position.set(-4 + i * 2.5, 0.5, -10 + i * 5);
+                houses.push(house);
+                scene.add(house);
             }
         }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            checkHouseCollision();
+            renderer.render(scene, camera);
+        }
+
+        function checkHouseCollision() {
+            const playerPosition = camera.position.z;
+            if (playerPosition < -4 + currentHouseIndex * 5) {
+                showTriviaPopup();
+            }
+        }
+
+        function showTriviaPopup() {
+            const question = triviaQuestions[currentHouseIndex].question;
+            document.getElementById('triviaQuestion').textContent = question;
+            document.getElementById('triviaPopup').classList.remove('hidden');
+
+            document.getElementById('submitAnswer').onclick = function() {
+                const answer = document.getElementById('triviaAnswer').value;
+                if (answer.toLowerCase() === triviaQuestions[currentHouseIndex].answer.toLowerCase()) {
+                    currentHouseIndex++;
+                    if (currentHouseIndex < triviaQuestions.length) {
+                        camera.position.z += 5; // Move to next house
+                    } else {
+                        alert("You've completed the game!");
+                    }
+                    document.getElementById('triviaPopup').classList.add('hidden');
+                    document.getElementById('triviaAnswer').value = ""; // Clear answer
+                } else {
+                    alert('Wrong answer! Try again.');
+                }
+            };
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Start the game
+        init();
     </script>
 </body>
 </html>
