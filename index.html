@@ -1,277 +1,158 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego del Rosario</title>
+    <title>Rosary Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
             text-align: center;
-            background-color: #f0f8ff;
-            color: #333;
+        }
+        #rosary-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 30px;
         }
         .bead {
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            display: inline-block;
-            margin: 5px;
+            background-color: #666;
             cursor: pointer;
-            border: 2px solid #000;
+            transition: background-color 0.3s;
         }
-        .completed {
-            opacity: 0.5;
+        .bead.clicked {
+            background-color: #2196F3;
         }
-        .progress {
-            width: 100%;
-            height: 20px;
-            background-color: #ddd;
-            margin: 20px 0;
+        .decade-separator {
+            width: 40px;
+            height: 10px;
+            background-color: #333;
+            margin: 10px;
         }
-        .progress-fill {
-            height: 100%;
-            background-color: #76c7c0;
-            width: 0; /* Start with 0% width */
+        #controls {
+            margin-top: 20px;
         }
-        .hidden {
-            display: none;
-        }
-        .popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border: 1px solid #000;
-            z-index: 1000;
-        }
-        .quiz-option, .match-item {
-            cursor: pointer;
-            margin: 5px;
-            padding: 10px;
-            background-color: #76c7c0;
-            border-radius: 5px;
-            display: inline-block;
+        #current-prayer {
+            font-size: 1.2em;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-    <h1>Juego del Rosario</h1>
-    <div id="rosary-container"></div>
-    <div class="progress">
-        <div id="progress-fill" class="progress-fill"></div>
+    <h1>Interactive Rosary Game</h1>
+    <p>Click on each bead to pray and progress through the Rosary.</p>
+
+    <div id="rosary-container">
+        <!-- 5 decades with 10 beads each and separators -->
     </div>
-    <div id="text-rosary"></div>
-    <div id="gif-container" class="hidden">
-        <img id="gif" src="" alt="GIF" />
+
+    <div id="controls">
+        <button onclick="resetRosary()">Reset Rosary</button>
+        <button onclick="toggleBackgroundMusic()">Toggle Background Music</button>
     </div>
-    <div id="quiz-container" class="hidden">
-        <div id="quiz-question"></div>
-        <div id="quiz-options"></div>
-    </div>
-    <div class="match-game hidden">
-        <div id="match-items"></div>
-    </div>
-    <div id="badges-container"></div>
-    <audio id="correct-sound" src="https://www.soundjay.com/button/sounds/button-3.mp3"></audio>
-    <audio id="incorrect-sound" src="https://www.soundjay.com/button/sounds/button-6.mp3"></audio>
-    <button onclick="resetGame()">Reiniciar Juego</button>
+
+    <div id="current-prayer">Click a bead to start</div>
+
+    <!-- Audio files -->
+    <audio id="our-father" src="our_father.mp3"></audio>
+    <audio id="hail-mary" src="hail_mary.mp3"></audio>
+    <audio id="glory-be" src="glory_be.mp3"></audio>
+    <audio id="chime" src="chime.mp3"></audio>
+    <audio id="background-music" src="background_music.mp3" loop></audio>
 
     <script>
-        const beadsColors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FFD733', '#33FFD7', '#FF8C33', '#33FF8C', '#FF3375', '#FF33B5'];
-        const totalBeads = 10; // Total beads for the rosary
-        let completedBeads = 0;
-        let achievements = [];
+        const prayers = [
+            { type: "Our Father", sound: "our-father" },
+            ...Array(10).fill({ type: "Hail Mary", sound: "hail-mary" }),
+            { type: "Glory Be", sound: "glory-be" }
+        ];
 
-        // Function to create beads
-        function createBeads() {
-            const rosaryContainer = document.getElementById('rosary-container');
-            rosaryContainer.innerHTML = '';
-            for (let i = 0; i < totalBeads; i++) {
-                const bead = document.createElement('div');
-                bead.className = 'bead';
-                bead.style.backgroundColor = beadsColors[i % beadsColors.length];
-                bead.onclick = () => showPrayerActivity(i);
-                rosaryContainer.appendChild(bead);
+        let currentDecade = 0;
+        const totalDecades = 5;
+        let backgroundMusicPlaying = false;
+
+        const rosaryContainer = document.getElementById("rosary-container");
+        const currentPrayerDisplay = document.getElementById("current-prayer");
+
+        function createRosary() {
+            for (let decade = 0; decade < totalDecades; decade++) {
+                const decadeContainer = document.createElement("div");
+                decadeContainer.classList.add("decade");
+
+                prayers.forEach(prayer => {
+                    const bead = document.createElement("div");
+                    bead.classList.add("bead");
+                    bead.onclick = () => playPrayer(prayer, bead);
+                    decadeContainer.appendChild(bead);
+                });
+
+                rosaryContainer.appendChild(decadeContainer);
+
+                if (decade < totalDecades - 1) {
+                    const separator = document.createElement("div");
+                    separator.classList.add("decade-separator");
+                    rosaryContainer.appendChild(separator);
+                }
             }
         }
 
-        // Function to show prayer activity
-        function showPrayerActivity(index) {
-            completedBeads++;
-            updateProgress((completedBeads / totalBeads) * 100);
-            document.querySelectorAll('.bead')[index].classList.add('completed');
-
-            switch (index) {
-                case 0:
-                    displayPrayer("Padre Nuestro");
-                    break;
-                case 1:
-                    fillInTheBlanks();
-                    break;
-                case 2:
-                    showTrivia();
-                    break;
-                case 3:
-                    showMatchGame();
-                    break;
-                case 4:
-                    quickFacts();
-                    break;
-                case 5:
-                    displayPrayer("Ave María");
-                    break;
-                case 6:
-                    showTrueFalse();
-                    break;
-                case 7:
-                    colorTheBead();
-                    break;
-                case 8:
-                    prayTogether();
-                    break;
-                case 9:
-                    unlockAchievement("¡Logro Completo! Has terminado el Rosario.");
-                    break;
-            }
-        }
-
-        // Function to display prayer
-        function displayPrayer(prayer) {
-            document.getElementById('text-rosary').innerText = prayer;
-            document.getElementById('gif-container').classList.remove('hidden');
-            document.getElementById('gif').src = "https://media.giphy.com/media/xT0xeE1v3Lxtv5Li4c/giphy.gif"; // Replace with an appropriate GIF
-            document.getElementById('correct-sound').play();
-        }
-
-        // Function for fill in the blanks activity
-        function fillInTheBlanks() {
-            const blanks = "Padre ___, que estás en los cielos.";
-            const userInput = prompt(Completa la oración: ${blanks});
-            if (userInput && userInput.toLowerCase() === 'nuestro') {
-                alert("¡Correcto!");
-                document.getElementById('correct-sound').play();
-            } else {
-                alert("Incorrecto. La respuesta correcta es: Nuestro.");
-                document.getElementById('incorrect-sound').play();
-            }
-        }
-
-        // Function to show trivia question
-        function showTrivia() {
-            const questions = [
-                { question: "¿Cuántos misterios hay en el Rosario?", options: ["10", "15", "20"], answer: "15" },
-                { question: "¿Cuál es el misterio de la Anunciación?", options: ["Gozosos", "Dolorosos", "Gloriosos"], answer: "Gozosos" }
-            ];
-            const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
-            document.getElementById('quiz-question').innerText = randomQuestion.question;
-            const optionsContainer = document.getElementById('quiz-options');
-            optionsContainer.innerHTML = '';
-            randomQuestion.options.forEach(option => {
-                const optionElement = document.createElement('div');
-                optionElement.className = 'quiz-option';
-                optionElement.innerText = option;
-                optionElement.onclick = () => {
-                    if (option === randomQuestion.answer) {
-                        alert("¡Correcto!");
-                        document.getElementById('correct-sound').play();
+        function playPrayer(prayer, bead) {
+            if (!bead.classList.contains("clicked")) {
+                bead.classList.add("clicked");
+                playSound(prayer.sound);
+                currentPrayerDisplay.textContent = `Praying: ${prayer.type}`;
+                
+                // Check if the decade is complete
+                if (isDecadeComplete()) {
+                    currentDecade++;
+                    if (currentDecade < totalDecades) {
+                        playSound("chime");  // Transition sound
+                        alert(`Decade ${currentDecade} complete!`);
                     } else {
-                        alert("Incorrecto, la respuesta correcta es: " + randomQuestion.answer);
-                        document.getElementById('incorrect-sound').play();
+                        alert("Rosary Complete! Well done!");
+                        resetRosary();
                     }
-                    document.getElementById('quiz-container').classList.add('hidden');
-                };
-                optionsContainer.appendChild(optionElement);
-            });
-            document.getElementById('quiz-container').classList.remove('hidden');
-        }
-
-        // Function to show match game
-        function showMatchGame() {
-            const pairs = [
-                { name: "Padre Nuestro", image: "https://example.com/padre_nuestro.png" }, // Replace with actual image URL
-                { name: "Ave María", image: "https://example.com/ave_maria.png" }, // Replace with actual image URL
-                { name: "Gloria", image: "https://example.com/gloria.png" } // Replace with actual image URL
-            ];
-            const items = pairs.concat(pairs).sort(() => Math.random() - 0.5); // Shuffle items
-            const matchItemsContainer = document.getElementById('match-items');
-            matchItemsContainer.innerHTML = '';
-            items.forEach(item => {
-                const matchItem = document.createElement('div');
-                matchItem.className = 'match-item';
-                matchItem.innerText = item.name;
-                matchItem.onclick = () => handleMatch(item.name);
-                matchItemsContainer.appendChild(matchItem);
-            });
-            document.querySelector('.match-game').classList.remove('hidden');
-        }
-
-        function handleMatch(selectedItem) {
-            alert("Seleccionaste: " + selectedItem);
-            // Logic to check if the selected item matches with its pair
-        }
-
-        // Function to show quick facts
-        function quickFacts() {
-            alert("El Rosario es una oración muy antigua que se remonta a los siglos XII y XIII.");
-            document.getElementById('correct-sound').play();
-        }
-
-        // Function to show true/false question
-        function showTrueFalse() {
-            const fact = "¿Es el Rosario solo para los católicos?";
-            const userAnswer = confirm(fact + "\n(Aceptar: Verdadero, Cancelar: Falso)");
-            if (userAnswer) {
-                alert("Incorrecto. El Rosario es también apreciado en otras tradiciones.");
-                document.getElementById('incorrect-sound').play();
-            } else {
-                alert("¡Correcto! No es exclusivo de los católicos.");
-                document.getElementById('correct-sound').play();
+                }
             }
         }
 
-        // Function to allow coloring the bead
-        function colorTheBead() {
-            alert("Reflexiona sobre el significado espiritual de los colores.");
-            document.getElementById('correct-sound').play();
+        function isDecadeComplete() {
+            const decadeBeads = rosaryContainer.querySelectorAll(".decade:nth-child(" + (currentDecade * 2 + 1) + ") .bead");
+            return Array.from(decadeBeads).every(bead => bead.classList.contains("clicked"));
         }
 
-        // Function for community prayer
-        function prayTogether() {
-            alert("¡Reza juntos! Aquí es donde puedes compartir tus intenciones.");
-            document.getElementById('correct-sound').play();
+        function playSound(soundId) {
+            const audio = document.getElementById(soundId);
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play();
+            }
         }
 
-        // Function to unlock achievements
-        function unlockAchievement(achievement) {
-            achievements.push(achievement);
-            alert(achievement);
-            document.getElementById('badges-container').innerText = achievements.join(', ');
-            document.getElementById('correct-sound').play();
+        function resetRosary() {
+            document.querySelectorAll(".bead").forEach(bead => bead.classList.remove("clicked"));
+            currentDecade = 0;
+            currentPrayerDisplay.textContent = "Click a bead to start";
         }
 
-        // Function to update progress
-        function updateProgress(percentage) {
-            document.getElementById('progress-fill').style.width = percentage + '%';
+        function toggleBackgroundMusic() {
+            const backgroundMusic = document.getElementById("background-music");
+            if (backgroundMusicPlaying) {
+                backgroundMusic.pause();
+                backgroundMusicPlaying = false;
+            } else {
+                backgroundMusic.play();
+                backgroundMusicPlaying = true;
+            }
         }
 
-        // Function to reset the game
-        function resetGame() {
-            completedBeads = 0;
-            achievements = [];
-            createBeads();
-            document.getElementById('text-rosary').innerText = '';
-            document.getElementById('gif-container').classList.add('hidden');
-            document.getElementById('quiz-container').classList.add('hidden');
-            document.querySelector('.match-game').classList.add('hidden');
-            document.getElementById('badges-container').innerText = '';
-            updateProgress(0);
-        }
-
-        // Initialize the game
-        createBeads();
+        // Initialize the Rosary on page load
+        createRosary();
     </script>
 </body>
 </html>
