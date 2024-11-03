@@ -1,137 +1,159 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Christmas Village Trivia Game</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #87CEEB;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-  }
-  #game-container {
-    position: relative;
-    width: 800px;
-    height: 600px;
-    background: url('https://path-to-snowy-village-background.jpg') center/cover no-repeat;
-    border: 5px solid #fff;
-    border-radius: 10px;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-  }
-  .house {
-    width: 50px;
-    height: 50px;
-    background: url('https://path-to-christmas-house-icon.png') center/cover no-repeat;
-    position: absolute;
-    cursor: pointer;
-  }
-  #trivia-card {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    display: none;
-    text-align: center;
-    max-width: 300px;
-  }
-  #question {
-    margin-bottom: 20px;
-    font-size: 18px;
-  }
-  .option {
-    margin: 5px 0;
-    padding: 10px;
-    background-color: #f3f3f3;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  #score {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 18px;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christmas Roadmap Game</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #a3d9f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Roadmap Container */
+        .roadmap {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            position: relative;
+            width: 80%;
+            height: 80%;
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Path Styling */
+        .path {
+            position: absolute;
+            top: 50px;
+            left: 20px;
+            width: calc(100% - 40px);
+            height: 300px;
+            border-left: 4px dotted #c45911;
+        }
+
+        /* Gingerbread Houses */
+        .house {
+            width: 100px;
+            height: 100px;
+            background-image: url('https://via.placeholder.com/100?text=House');
+            background-size: cover;
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .house:hover {
+            transform: scale(1.1);
+        }
+
+        /* House Positions */
+        .house1 { top: 20px; left: 0; }
+        .house2 { top: 100px; left: 60px; }
+        .house3 { top: 180px; left: 20px; }
+        .house4 { top: 260px; left: 80px; }
+        .house5 { top: 340px; left: 40px; }
+
+        /* Trivia Card */
+        .trivia-card {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .trivia-card h3 {
+            margin: 0 0 10px;
+            font-size: 1.2em;
+            color: #c45911;
+        }
+
+        .trivia-card button {
+            padding: 8px 12px;
+            background-color: #c45911;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .trivia-card button:hover {
+            background-color: #a6440e;
+        }
+
+        /* Overlay for Trivia Pop-Up */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 5;
+        }
+    </style>
 </head>
 <body>
-<div id="game-container">
-  <div id="score">Score: 0</div>
 
-  <!-- Houses -->
-  <div class="house" style="top: 100px; left: 100px;" onclick="openTrivia(0)"></div>
-  <div class="house" style="top: 200px; left: 300px;" onclick="openTrivia(1)"></div>
-  <div class="house" style="top: 300px; left: 150px;" onclick="openTrivia(2)"></div>
-  <div class="house" style="top: 400px; left: 400px;" onclick="openTrivia(3)"></div>
+<div class="roadmap">
+    <div class="path"></div>
+    <div class="house house1" onclick="showTrivia(0)"></div>
+    <div class="house house2" onclick="showTrivia(1)"></div>
+    <div class="house house3" onclick="showTrivia(2)"></div>
+    <div class="house house4" onclick="showTrivia(3)"></div>
+    <div class="house house5" onclick="showTrivia(4)"></div>
+</div>
 
-  <!-- Trivia Card Popup -->
-  <div id="trivia-card">
-    <div id="question"></div>
-    <div class="option" onclick="selectAnswer(0)"></div>
-    <div class="option" onclick="selectAnswer(1)"></div>
-    <div class="option" onclick="selectAnswer(2)"></div>
-  </div>
+<div class="overlay" onclick="closeTrivia()"></div>
+
+<div class="trivia-card" id="triviaCard">
+    <h3 id="questionText">Question?</h3>
+    <button onclick="closeTrivia()">Close</button>
 </div>
 
 <script>
-  const triviaQuestions = [
-    {
-      question: "What date is Christmas celebrated on?",
-      options: ["December 25", "January 1", "November 25"],
-      correct: 0
-    },
-    {
-      question: "Who delivers presents to children on Christmas Eve?",
-      options: ["Santa Claus", "The Easter Bunny", "Tooth Fairy"],
-      correct: 0
-    },
-    {
-      question: "What is traditionally placed on top of a Christmas tree?",
-      options: ["A star", "A pumpkin", "A flag"],
-      correct: 0
-    },
-    {
-      question: "Which reindeer is famous for its red nose?",
-      options: ["Rudolph", "Blitzen", "Dasher"],
-      correct: 0
-    }
-  ];
-  let score = 0;
-  let currentQuestionIndex = -1;
+    // Trivia Questions Array
+    const triviaQuestions = [
+        "What color is Santa's suit?",
+        "What snack is often left out for Santa?",
+        "Name one of Santa's reindeer.",
+        "Where does Santa live?",
+        "What Christmas plant is considered lucky?"
+    ];
 
-  function openTrivia(index) {
-    currentQuestionIndex = index;
-    const trivia = triviaQuestions[index];
-    document.getElementById("question").textContent = trivia.question;
-    document.querySelectorAll(".option").forEach((opt, i) => {
-      opt.textContent = trivia.options[i];
-    });
-    document.getElementById("trivia-card").style.display = "block";
-  }
-
-  function selectAnswer(option) {
-    const trivia = triviaQuestions[currentQuestionIndex];
-    if (option === trivia.correct) {
-      score += 1;
-      document.getElementById("score").textContent = "Score: " + score;
+    // Show trivia question function
+    function showTrivia(index) {
+        document.getElementById('questionText').innerText = triviaQuestions[index];
+        document.querySelector('.overlay').style.display = 'block';
+        document.getElementById('triviaCard').style.display = 'block';
     }
-    document.getElementById("trivia-card").style.display = "none";
-  }
+
+    // Close trivia pop-up
+    function closeTrivia() {
+        document.querySelector('.overlay').style.display = 'none';
+        document.getElementById('triviaCard').style.display = 'none';
+    }
 </script>
+
 </body>
 </html>
