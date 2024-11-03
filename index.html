@@ -35,34 +35,63 @@
         /* Path Styling */
         .path {
             position: absolute;
-            top: 50px;
+            top: 100px;
             left: 20px;
             width: calc(100% - 40px);
             height: 300px;
             border-left: 4px dotted #c45911;
         }
 
+        /* Scene Styling */
+        .scene {
+            width: 100%;
+            height: 100px;
+            position: relative;
+            margin-bottom: 20px;
+            background-color: #e0f7fa; /* Light blue for scenes */
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
         /* Gingerbread Houses */
         .house {
-            width: 100px;
-            height: 100px;
-            background-image: url('https://via.placeholder.com/100?text=House');
+            width: 80px;
+            height: 80px;
             background-size: cover;
             position: absolute;
             cursor: pointer;
             transition: transform 0.2s;
         }
 
-        .house:hover {
-            transform: scale(1.1);
+        .house1 {
+            top: 10px; 
+            left: 10px; 
+            background-image: url('https://example.com/path/to/your-house1.gif'); /* Replace with your image URL */
         }
 
-        /* House Positions */
-        .house1 { top: 20px; left: 0; }
-        .house2 { top: 100px; left: 60px; }
-        .house3 { top: 180px; left: 20px; }
-        .house4 { top: 260px; left: 80px; }
-        .house5 { top: 340px; left: 40px; }
+        .house2 {
+            top: 10px; 
+            left: 120px; 
+            background-image: url('https://example.com/path/to/your-house2.gif'); /* Replace with your image URL */
+        }
+
+        .house3 {
+            top: 10px; 
+            left: 230px; 
+            background-image: url('https://example.com/path/to/your-house3.gif'); /* Replace with your image URL */
+        }
+
+        .house4 {
+            top: 10px; 
+            left: 340px; 
+            background-image: url('https://example.com/path/to/your-house4.gif'); /* Replace with your image URL */
+        }
+
+        .house5 {
+            top: 10px; 
+            left: 450px; 
+            background-image: url('https://example.com/path/to/your-house5.gif'); /* Replace with your image URL */
+        }
 
         /* Trivia Card */
         .trivia-card {
@@ -117,11 +146,23 @@
 
 <div class="roadmap">
     <div class="path"></div>
-    <div class="house house1" onclick="showTrivia(0)"></div>
-    <div class="house house2" onclick="showTrivia(1)"></div>
-    <div class="house house3" onclick="showTrivia(2)"></div>
-    <div class="house house4" onclick="showTrivia(3)"></div>
-    <div class="house house5" onclick="showTrivia(4)"></div>
+
+    <!-- Scene 1 -->
+    <div class="scene">
+        <div class="house house1" onclick="showTrivia(0)"></div>
+        <div class="house house2" onclick="showTrivia(1)"></div>
+    </div>
+
+    <!-- Scene 2 -->
+    <div class="scene">
+        <div class="house house3" onclick="showTrivia(2)"></div>
+        <div class="house house4" onclick="showTrivia(3)"></div>
+    </div>
+
+    <!-- Scene 3 -->
+    <div class="scene">
+        <div class="house house5" onclick="showTrivia(4)"></div>
+    </div>
 </div>
 
 <div class="overlay" onclick="closeTrivia()"></div>
