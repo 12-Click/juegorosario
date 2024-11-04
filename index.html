@@ -3,153 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Christmas Village Game</title>
+    <title>Christmas Game</title>
     <style>
         body {
             margin: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
-
-        #gameContainer {
-            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
+            background-color: #87CEEB; /* Sky color */
+            overflow: hidden; /* Prevent scrolling */
         }
-
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
         #triviaPopup {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
-            border: 1px solid #ccc;
+            background-color: white;
+            border: 1px solid #000;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            z-index: 10;
+            display: none; /* Hidden by default */
+            width: 80%; /* Responsive width */
+            max-width: 400px; /* Max width for larger screens */
         }
-
-        .hidden {
-            display: none;
+        #triviaPopup h2 {
+            margin: 0;
+            font-size: 1.2em; /* Responsive font size */
         }
-
-        .popup-content {
-            text-align: center;
+        #triviaPopup input {
+            margin: 10px 0;
+            width: 100%;
+            padding: 8px; /* Padding for better touch input */
+        }
+        #triviaPopup button {
+            margin-right: 10px;
         }
     </style>
+    <script src="https://pixijs.download/release/pixi.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 </head>
 <body>
-    <div id="gameContainer"></div>
-    <div id="triviaPopup" class="hidden">
-        <div class="popup-content">
-            <h2>Trivia Question</h2>
-            <p id="triviaQuestion"></p>
+    <div id="game-container">
+        <div id="triviaPopup">
+            <h2 id="triviaQuestion"></h2>
             <input type="text" id="triviaAnswer" placeholder="Your answer here">
             <button id="submitAnswer">Submit</button>
+            <button id="closePopup">Close</button>
+            <p id="scoreDisplay">Score: 0</p>
         </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        let scene, camera, renderer;
-        let road, houses = [];
-        let currentHouseIndex = 0;
+        const app = new PIXI.Application({ 
+            width: window.innerWidth, 
+            height: window.innerHeight,
+            resizeTo: window // Automatically resizes canvas when window is resized
+        });
+        document.getElementById("game-container").appendChild(app.view);
+
+        // Load sound effects
+        const correctSound = new Howl({ src: ['https://example.com/correct.mp3'] }); // Replace with your sound file
+        const wrongSound = new Howl({ src: ['https://example.com/wrong.mp3'] }); // Replace with your sound file
+        const backgroundMusic = new Howl({ src: ['https://example.com/background.mp3'], loop: true }); // Replace with your sound file
+
         const triviaQuestions = [
-            { question: "What is the name of Santa's reindeer?", answer: "Rudolph" },
-            { question: "In which country is the tradition of the Advent calendar believed to have started?", answer: "Germany" },
-            { question: "What do people traditionally put on top of a Christmas tree?", answer: "Star" }
+            { question: "What color is Santa's sleigh?", answer: "red" },
+            { question: "How many reindeer does Santa have?", answer: "nine" },
+            { question: "What is the name of the reindeer that leads Santa's sleigh?", answer: "Rudolph" },
+            { question: "What do you leave for Santa on Christmas Eve?", answer: "cookies" },
+            { question: "In which direction does Santa's sleigh fly?", answer: "north" },
         ];
 
-        function init() {
-            // Scene setup
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.getElementById('gameContainer').appendChild(renderer.domElement);
+        let currentHouse = 0;
+        let score = 0;
 
-            // Road creation
-            createRoad();
+        // Load textures
+        const houseTexture = PIXI.Texture.from('https://example.com/house.png'); // Replace with your house image URL
+        const roadTexture = PIXI.Texture.from('https://example.com/road.png'); // Replace with your road image URL
 
-            // House creation
-            createHouses();
+        function drawRoadmap() {
+            app.stage.removeChildren(); // Clear previous drawings
+            const road = new PIXI.Sprite(roadTexture);
+            road.y = app.renderer.height - 100;
+            road.width = app.renderer.width; // Make road responsive to screen width
+            app.stage.addChild(road);
 
-            camera.position.z = 5;
-
-            // Animation loop
-            animate();
+            drawHouses();
         }
 
-        function createRoad() {
-            const geometry = new THREE.PlaneGeometry(10, 100);
-            const textureLoader = new THREE.TextureLoader();
-            const roadTexture = textureLoader.load('images/road.gif'); // Replace with your road GIF path
-            const material = new THREE.MeshBasicMaterial({ map: roadTexture });
-            road = new THREE.Mesh(geometry, material);
-            road.rotation.x = -Math.PI / 2;
-            scene.add(road);
+        function drawHouses() {
+            const housePositions = [0.2 * app.renderer.width, 0.5 * app.renderer.width, 0.8 * app.renderer.width];
+            housePositions.forEach((pos, index) => {
+                const house = new PIXI.Sprite(houseTexture);
+                house.x = pos - (house.width / 2); // Center the house sprite
+                house.y = app.renderer.height - 200;
+                house.interactive = true;
+                house.buttonMode = true;
+
+                // Add animation on hover
+                house.on('pointerover', () => {
+                    house.scale.set(1.1); // Scale up on hover
+                });
+                house.on('pointerout', () => {
+                    house.scale.set(1); // Scale back to normal
+                });
+
+                house.on('pointerdown', () => {
+                    currentHouse = index;
+                    showTrivia();
+                });
+
+                app.stage.addChild(house);
+            });
         }
 
-        function createHouses() {
-            const houseImages = [
-                'images/house1.png', // Replace with your house image paths
-                'images/house2.png',
-                'images/house3.png'
-            ];
-
-            for (let i = 0; i < triviaQuestions.length; i++) {
-                const geometry = new THREE.BoxGeometry(1, 1, 1);
-                const textureLoader = new THREE.TextureLoader();
-                const houseTexture = textureLoader.load(houseImages[i]);
-                const material = new THREE.MeshBasicMaterial({ map: houseTexture });
-                const house = new THREE.Mesh(geometry, material);
-                house.position.set(-4 + i * 2.5, 0.5, -10 + i * 5);
-                houses.push(house);
-                scene.add(house);
-            }
+        function showTrivia() {
+            const popup = document.getElementById("triviaPopup");
+            const questionElement = document.getElementById("triviaQuestion");
+            const answerInput = document.getElementById("triviaAnswer");
+            const scoreDisplay = document.getElementById("scoreDisplay");
+            
+            questionElement.textContent = triviaQuestions[currentHouse].question;
+            popup.style.display = "block";
+            answerInput.value = "";
+            answerInput.focus();
+            scoreDisplay.textContent = `Score: ${score}`;
         }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            checkHouseCollision();
-            renderer.render(scene, camera);
-        }
-
-        function checkHouseCollision() {
-            const playerPosition = camera.position.z;
-            if (playerPosition < -4 + currentHouseIndex * 5) {
-                showTriviaPopup();
-            }
-        }
-
-        function showTriviaPopup() {
-            const question = triviaQuestions[currentHouseIndex].question;
-            document.getElementById('triviaQuestion').textContent = question;
-            document.getElementById('triviaPopup').classList.remove('hidden');
-
-            document.getElementById('submitAnswer').onclick = function() {
-                const answer = document.getElementById('triviaAnswer').value;
-                if (answer.toLowerCase() === triviaQuestions[currentHouseIndex].answer.toLowerCase()) {
-                    currentHouseIndex++;
-                    if (currentHouseIndex < triviaQuestions.length) {
-                        camera.position.z += 5; // Move to next house
-                    } else {
-                        alert("You've completed the game!");
-                    }
-                    document.getElementById('triviaPopup').classList.add('hidden');
-                    document.getElementById('triviaAnswer').value = ""; // Clear answer
+        document.getElementById("submitAnswer").onclick = function () {
+            const answer = document.getElementById("triviaAnswer").value.toLowerCase();
+            if (answer === triviaQuestions[currentHouse].answer) {
+                correctSound.play(); // Play correct answer sound
+                score += 10; // Increment score
+                alert("Correct! Moving to the next house.");
+                currentHouse++;
+                if (currentHouse < triviaQuestions.length) {
+                    drawRoadmap();
+                    closePopup();
                 } else {
-                    alert('Wrong answer! Try again.');
+                    alert("Congratulations! You've completed the game!");
+                    resetGame();
                 }
-            };
+            } else {
+                wrongSound.play(); // Play wrong answer sound
+                alert("Incorrect, try again!");
+            }
+        };
+
+        document.getElementById("closePopup").onclick = closePopup;
+
+        function closePopup() {
+            document.getElementById("triviaPopup").style.display = "none";
         }
 
+        function resetGame() {
+            currentHouse = 0;
+            score = 0; // Reset score
+            drawRoadmap();
+        }
+
+        // Start background music
+        backgroundMusic.play();
+
+        // Resize event handler
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+            app.renderer.resize(window.innerWidth, window.innerHeight);
+            drawRoadmap(); // Redraw roadmap on resize
         });
 
-        // Start the game
-        init();
+        // Initial call to draw the roadmap
+        drawRoadmap();
     </script>
 </body>
 </html>
