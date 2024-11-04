@@ -1,184 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Christmas Game</title>
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #87CEEB; /* Sky color */
-            overflow: hidden; /* Prevent scrolling */
-        }
-        #game-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-        #triviaPopup {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            background-color: white;
-            border: 1px solid #000;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 10;
-            display: none; /* Hidden by default */
-            width: 80%; /* Responsive width */
-            max-width: 400px; /* Max width for larger screens */
-        }
-        #triviaPopup h2 {
-            margin: 0;
-            font-size: 1.2em; /* Responsive font size */
-        }
-        #triviaPopup input {
-            margin: 10px 0;
-            width: 100%;
-            padding: 8px; /* Padding for better touch input */
-        }
-        #triviaPopup button {
-            margin-right: 10px;
-        }
-    </style>
-    <script src="https://pixijs.download/release/pixi.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Christmas Trivia Journey</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #dff0f9;
+      color: #333;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #game-container {
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    #start-screen {
+      text-align: center;
+    }
+
+    #icon-selection {
+      display: flex;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .icon-btn {
+      font-size: 1.5em;
+      padding: 10px;
+      cursor: pointer;
+      background: #e6f7ff;
+      border: 2px solid #333;
+      border-radius: 5px;
+    }
+
+    .control-btn {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: #ffcccc;
+      border: none;
+      border-radius: 5px;
+    }
+
+    #scenes {
+      display: flex;
+      gap: 30px;
+      position: relative;
+    }
+
+    .scene {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: #e6f7ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      cursor: pointer;
+    }
+
+    .house {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #player-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+    }
+
+    #trivia-popup {
+      background-color: #fff;
+      padding: 20px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #feedback {
+      margin-top: 10px;
+    }
+
+    #instructions {
+      margin-top: 20px;
+      font-size: 1.1em;
+    }
+  </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="triviaPopup">
-            <h2 id="triviaQuestion"></h2>
-            <input type="text" id="triviaAnswer" placeholder="Your answer here">
-            <button id="submitAnswer">Submit</button>
-            <button id="closePopup">Close</button>
-            <p id="scoreDisplay">Score: 0</p>
-        </div>
+  <div id="game-container">
+    <!-- Start Screen -->
+    <div id="start-screen">
+      <h1>Welcome to the Christmas Trivia Journey!</h1>
+      <p>Choose your player icon:</p>
+      <div id="icon-selection">
+        <button class="icon-btn" data-icon="🎄">Christmas Tree</button>
+        <button class="icon-btn" data-icon="🦌">Reindeer</button>
+        <button class="icon-btn" data-icon="🎅">Elf</button>
+        <button class="icon-btn" data-icon="🐿️">Chipmunk</button>
+      </div>
+      <button id="start-game">Start Game</button>
     </div>
-    <script>
-        const app = new PIXI.Application({ 
-            width: window.innerWidth, 
-            height: window.innerHeight,
-            resizeTo: window // Automatically resizes canvas when window is resized
-        });
-        document.getElementById("game-container").appendChild(app.view);
 
-        // Load sound effects
-        const correctSound = new Howl({ src: ['https://example.com/correct.mp3'] }); // Replace with your sound file
-        const wrongSound = new Howl({ src: ['https://example.com/wrong.mp3'] }); // Replace with your sound file
-        const backgroundMusic = new Howl({ src: ['https://example.com/background.mp3'], loop: true }); // Replace with your sound file
+    <!-- Game Scenes Container -->
+    <div id="scenes" class="hidden">
+      <div id="player-icon" class="player hidden"></div>
 
-        const triviaQuestions = [
-            { question: "What color is Santa's sleigh?", answer: "red" },
-            { question: "How many reindeer does Santa have?", answer: "nine" },
-            { question: "What is the name of the reindeer that leads Santa's sleigh?", answer: "Rudolph" },
-            { question: "What do you leave for Santa on Christmas Eve?", answer: "cookies" },
-            { question: "In which direction does Santa's sleigh fly?", answer: "north" },
-        ];
+      <!-- Each scene will have a house with trivia -->
+      <div class="scene" id="scene1">
+        <div class="house" data-scene="1">🎄</div>
+      </div>
+      <div class="scene" id="scene2">
+        <div class="house" data-scene="2">🎅</div>
+      </div>
+      <div class="scene" id="scene3">
+        <div class="house" data-scene="3">🎁</div>
+      </div>
+      <div class="scene" id="scene4">
+        <div class="house" data-scene="4">⛄</div>
+      </div>
+      <div class="scene" id="scene5">
+        <div class="house" data-scene="5">🕯️</div>
+      </div>
+      <div class="scene" id="scene6">
+        <div class="house" data-scene="6">🌟</div>
+      </div>
+      <div class="scene" id="scene7">
+        <div class="house" data-scene="7">🎉</div>
+      </div>
 
-        let currentHouse = 0;
-        let score = 0;
+      <!-- Pause and Resume Buttons -->
+      <button id="pause-game" class="control-btn">Pause</button>
+      <button id="resume-game" class="control-btn hidden">Continue</button>
+    </div>
+    
+    <!-- Trivia Popup -->
+    <div id="trivia-popup" class="hidden">
+      <h2>Trivia Question</h2>
+      <p id="trivia-question"></p>
+      <input type="text" id="trivia-answer" placeholder="Your answer...">
+      <button id="submit-answer">Submit</button>
+      <button id="close-popup" onclick="closePopup()">Close</button>
+      <p id="feedback"></p>
+    </div>
+    
+    <!-- Instructions -->
+    <p id="instructions" class="hidden">Move through the village by answering trivia questions correctly!</p>
+  </div>
 
-        // Load textures
-        const houseTexture = PIXI.Texture.from('https://example.com/house.png'); // Replace with your house image URL
-        const roadTexture = PIXI.Texture.from('https://example.com/road.png'); // Replace with your road image URL
+  <script>
+    const startScreen = document.getElementById('start-screen');
+    const scenesContainer = document.getElementById('scenes');
+    const playerIcon = document.getElementById('player-icon');
+    const pauseButton = document.getElementById('pause-game');
+    const resumeButton = document.getElementById('resume-game');
+    const triviaPopup = document.getElementById('trivia-popup');
+    const triviaQuestionElem = document.getElementById('trivia-question');
+    const triviaAnswerInput = document.getElementById('trivia-answer');
+    const feedbackElem = document.getElementById('feedback');
+    let currentScene = 1;
+    let selectedIcon = "";
 
-        function drawRoadmap() {
-            app.stage.removeChildren(); // Clear previous drawings
-            const road = new PIXI.Sprite(roadTexture);
-            road.y = app.renderer.height - 100;
-            road.width = app.renderer.width; // Make road responsive to screen width
-            app.stage.addChild(road);
+    // Trivia questions and answers
+    const triviaQuestions = [
+      { question: "What is Santa's favorite snack?", answer: "cookies" },
+      { question: "What do people put on top of a Christmas tree?", answer: "star" },
+      { question: "Which reindeer has a red nose?", answer: "rudolph" },
+      { question: "Name a common holiday drink.", answer: "eggnog" },
+      { question: "Which date is Christmas celebrated on?", answer: "25" },
+      { question: "What color is Santa's suit?", answer: "red" },
+      { question: "How many reindeer does Santa have?", answer: "8" }
+    ];
 
-            drawHouses();
-        }
+    // Start the game
+    document.getElementById('start-game').addEventListener('click', () => {
+      if (selectedIcon) {
+        startScreen.classList.add('hidden');
+        scenesContainer.classList.remove('hidden');
+        playerIcon.classList.remove('hidden');
+        playerIcon.textContent = selectedIcon;
+        document.getElementById('instructions').classList.remove('hidden');
+      } else {
+        alert("Please select a player icon!");
+      }
+    });
 
-        function drawHouses() {
-            const housePositions = [0.2 * app.renderer.width, 0.5 * app.renderer.width, 0.8 * app.renderer.width];
-            housePositions.forEach((pos, index) => {
-                const house = new PIXI.Sprite(houseTexture);
-                house.x = pos - (house.width / 2); // Center the house sprite
-                house.y = app.renderer.height - 200;
-                house.interactive = true;
-                house.buttonMode = true;
+    // Select player icon
+    document.querySelectorAll('.icon-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedIcon = btn.getAttribute('data-icon');
+        playerIcon.textContent = selectedIcon;
+      });
+    });
 
-                // Add animation on hover
-                house.on('pointerover', () => {
-                    house.scale.set(1.1); // Scale up on hover
-                });
-                house.on('pointerout', () => {
-                    house.scale.set(1); // Scale back to normal
-                });
+    // Pause and Resume functionality
+    pauseButton.addEventListener('click', () => {
+      scenesContainer.classList.add('hidden');
+      triviaPopup.classList.add('hidden');
+      pauseButton.classList.add('hidden');
+      resumeButton.classList.remove('hidden');
+    });
 
-                house.on('pointerdown', () => {
-                    currentHouse = index;
-                    showTrivia();
-                });
+    resumeButton.addEventListener('click', () => {
+      scenesContainer.classList.remove('hidden');
+      resumeButton.classList.add('hidden');
+      pauseButton.classList.remove('hidden');
+    });
 
-                app.stage.addChild(house);
-            });
-        }
+    // Trivia popup interaction
+    function showTrivia(sceneNum) {
+      const trivia = triviaQuestions[sceneNum - 1];
+      triviaQuestionElem.textContent = trivia.question;
+      feedbackElem.textContent = "";
+      triviaPopup.classList.remove('hidden');
+    }
 
-        function showTrivia() {
-            const popup = document.getElementById("triviaPopup");
-            const questionElement = document.getElementById("triviaQuestion");
-            const answerInput = document.getElementById("triviaAnswer");
-            const scoreDisplay = document.getElementById("scoreDisplay");
-            
-            questionElement.textContent = triviaQuestions[currentHouse].question;
-            popup.style.display = "block";
-            answerInput.value = "";
-            answerInput.focus();
-            scoreDisplay.textContent = `Score: ${score}`;
-        }
+    document.getElementById('submit-answer').addEventListener('click', () => {
+      const answer = triviaAnswerInput.value.toLowerCase();
+      const correctAnswer = triviaQuestions[currentScene - 1].answer;
 
-        document.getElementById("submitAnswer").onclick = function () {
-            const answer = document.getElementById("triviaAnswer").value.toLowerCase();
-            if (answer === triviaQuestions[currentHouse].answer) {
-                correctSound.play(); // Play correct answer sound
-                score += 10; // Increment score
-                alert("Correct! Moving to the next house.");
-                currentHouse++;
-                if (currentHouse < triviaQuestions.length) {
-                    drawRoadmap();
-                    closePopup();
-                } else {
-                    alert("Congratulations! You've completed the game!");
-                    resetGame();
-                }
-            } else {
-                wrongSound.play(); // Play wrong answer sound
-                alert("Incorrect, try again!");
-            }
-        };
+      if (answer === correctAnswer) {
+        feedbackElem.textContent = "Correct! Moving to the next scene.";
+        currentScene++;
+        triviaPopup.classList.add('hidden');
+        triviaAnswerInput.value = "";
+      } else {
+        feedbackElem.textContent = "Incorrect. Try again!";
+      }
+    });
 
-        document.getElementById("closePopup").onclick = closePopup;
-
-        function closePopup() {
-            document.getElementById("triviaPopup").style.display = "none";
-        }
-
-        function resetGame() {
-            currentHouse = 0;
-            score = 0; // Reset score
-            drawRoadmap();
-        }
-
-        // Start background music
-        backgroundMusic.play();
-
-        // Resize event handler
-        window.addEventListener('resize', () => {
-            app.renderer.resize(window.innerWidth, window.innerHeight);
-            drawRoadmap(); // Redraw roadmap on resize
-        });
-
-        // Initial call to draw the roadmap
-        drawRoadmap();
-    </script>
+    function closePopup() {
+      triviaPopup.classList.add('hidden');
+    }
+  </script>
 </body>
 </html>
