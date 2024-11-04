@@ -71,6 +71,15 @@
             left: -15px;
             border-radius: 5px;
         }
+        /* Additional styling for the vertical beads */
+        .vertical-bead {
+            width: 25px;
+            height: 25px;
+            background-color: #666;
+            position: absolute;
+            border-radius: 50%;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -97,7 +106,7 @@
     <script>
         const prayers = [
             { type: "Our Father", sound: "our-father" },
-            ...Array(10).fill({ type: "Hail Mary", sound: "hail-mary" }),
+            ...Array(9).fill({ type: "Hail Mary", sound: "hail-mary" }),
             { type: "Glory Be", sound: "glory-be" }
         ];
 
@@ -147,26 +156,24 @@
                 rosaryContainer.appendChild(bead);
             }
 
-            // Connector beads leading to the cross in a slight curve
+            // Vertical beads leading to the cross
             const connectorBeadCount = 5;
-            const connectorYOffset = 50; // Distance between each connector bead
-            const curveRadius = 15; // Adjust for a slight curve
+            const verticalBeadYOffset = 35; // Distance between each vertical bead
+            const crossOffsetY = -80; // Offset for the cross from the last bead
 
-            for (let j = 1; j <= connectorBeadCount; j++) {
-                const connectorBead = document.createElement("div");
-                connectorBead.classList.add("bead");
-                const angleOffset = (j - 3) * 0.1; // Creates slight curve
-                const x = 210 + curveRadius * Math.sin(angleOffset);
-                const y = 360 + j * connectorYOffset;
-                connectorBead.style.left = `${x}px`;
-                connectorBead.style.top = `${y}px`;
-                connectorBead.onclick = () => playPrayerAndActivity(j, connectorBead);
-                rosaryContainer.appendChild(connectorBead);
+            for (let j = 0; j < connectorBeadCount; j++) {
+                const verticalBead = document.createElement("div");
+                verticalBead.classList.add("vertical-bead");
+                verticalBead.style.left = "50%"; // Center it horizontally
+                verticalBead.style.top = `${350 + j * verticalBeadYOffset}px`; // Space them vertically
+                verticalBead.onclick = () => playPrayerAndActivity(j + 10, verticalBead);
+                rosaryContainer.appendChild(verticalBead);
             }
 
             // Cross element
             const cross = document.createElement("div");
             cross.classList.add("cross");
+            cross.style.top = `${350 + connectorBeadCount * verticalBeadYOffset + crossOffsetY}px`; // Position the cross
             rosaryContainer.appendChild(cross);
         }
 
