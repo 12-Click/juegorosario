@@ -127,6 +127,7 @@
       left: 50%;
       transform: translate(-50%, -50%);
       animation: fadeIn 0.8s;
+      display: none; /* Hidden by default */
     }
     #trivia-popup input, #submit-answer, #close-popup {
       display: block;
@@ -273,6 +274,16 @@
       scenesContainer.classList.remove('hidden');
       resumeButton.classList.add('hidden');
       pauseButton.classList.remove('hidden');
+    });
+
+    // Event listener for each house in the current scene
+    document.querySelectorAll('.house').forEach(house => {
+      house.addEventListener('click', () => {
+        const sceneNum = parseInt(house.dataset.scene);
+        if (sceneNum === currentScene) {
+          showTrivia(sceneNum);
+        }
+      });
     });
 
     function showTrivia(sceneNum) {
