@@ -5,113 +5,178 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Christmas Trivia Journey</title>
   <style>
+    /* Base styles and reset */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-
     body {
       font-family: Arial, sans-serif;
-      background-color: #dff0f9;
+      background-color: #f0f8ff;
       color: #333;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    #game-container {
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    
+    /* Container and layout */
+    #game-container {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
       flex-direction: column;
+      align-items: center;
       text-align: center;
+      padding: 10px;
     }
-
+    
+    /* Start screen and selection styling */
     #start-screen {
-      text-align: center;
+      animation: fadeIn 0.8s;
     }
-
     #icon-selection {
       display: flex;
       gap: 10px;
       margin: 10px 0;
+      flex-wrap: wrap;
     }
-
     .icon-btn {
-      font-size: 1.5em;
+      font-size: 1.8em;
       padding: 10px;
       cursor: pointer;
       background: #e6f7ff;
       border: 2px solid #333;
+      border-radius: 8px;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+    .icon-btn:hover {
+      transform: scale(1.1);
+      background-color: #cceeff;
+    }
+    #start-game {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #ff8080;
+      color: white;
+      font-size: 1em;
+      border: none;
       border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #start-game:hover {
+      background-color: #ff6666;
+    }
+    
+    /* Game scenes styling */
+    #scenes {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      align-items: center;
+    }
+    .scene {
+      width: 80%;
+      max-width: 150px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: #e6f7ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.5rem;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      transition: transform 0.3s, background-color 0.3s;
+    }
+    .scene:hover {
+      transform: scale(1.05);
+      background-color: #cceeff;
+    }
+    .house {
+      font-size: 1.8em;
     }
 
+    /* Player icon display */
+    #player-icon {
+      font-size: 2rem;
+      position: fixed;
+      top: 5%;
+      right: 5%;
+      background-color: #ffefc1;
+      padding: 10px;
+      border-radius: 50%;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      animation: bounce 1.5s infinite;
+    }
+
+    /* Trivia popup styling */
+    #trivia-popup {
+      background-color: #fff;
+      padding: 20px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 350px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: fadeIn 0.8s;
+    }
+    #trivia-popup input, #submit-answer, #close-popup {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      font-size: 1em;
+    }
+    #submit-answer {
+      background-color: #80d4ff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #submit-answer:hover {
+      background-color: #66c2ff;
+    }
+    #feedback {
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: green;
+    }
+
+    /* Control buttons */
     .control-btn {
-      margin: 10px;
       padding: 10px 20px;
       font-size: 1em;
       cursor: pointer;
       background-color: #ffcccc;
       border: none;
       border-radius: 5px;
+      margin: 5px;
     }
 
-    #scenes {
-      display: flex;
-      gap: 30px;
-      position: relative;
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
-    .scene {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: #e6f7ff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2rem;
-      cursor: pointer;
-    }
-
-    .house {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #player-icon {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 2rem;
-    }
-
-    #trivia-popup {
-      background-color: #fff;
-      padding: 20px;
-      border: 2px solid #333;
-      border-radius: 8px;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 300px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    #feedback {
-      margin-top: 10px;
-    }
-
-    #instructions {
-      margin-top: 20px;
-      font-size: 1.1em;
+    /* Responsive design */
+    @media (max-width: 480px) {
+      #game-container { padding: 20px; }
+      #instructions { font-size: 0.9em; }
+      .icon-btn { font-size: 1.3em; padding: 8px; }
+      #player-icon { font-size: 1.8em; top: 10%; }
     }
   </style>
 </head>
@@ -119,10 +184,10 @@
   <div id="game-container">
     <!-- Start Screen -->
     <div id="start-screen">
-      <h1>Welcome to the Christmas Trivia Journey!</h1>
+      <h1>Christmas Trivia Journey</h1>
       <p>Choose your player icon:</p>
       <div id="icon-selection">
-        <button class="icon-btn" data-icon="🎄">Christmas Tree</button>
+        <button class="icon-btn" data-icon="🎄">Tree</button>
         <button class="icon-btn" data-icon="🦌">Reindeer</button>
         <button class="icon-btn" data-icon="🎅">Elf</button>
         <button class="icon-btn" data-icon="🐿️">Chipmunk</button>
@@ -133,31 +198,13 @@
     <!-- Game Scenes Container -->
     <div id="scenes" class="hidden">
       <div id="player-icon" class="player hidden"></div>
-
-      <!-- Each scene will have a house with trivia -->
-      <div class="scene" id="scene1">
-        <div class="house" data-scene="1">🎄</div>
-      </div>
-      <div class="scene" id="scene2">
-        <div class="house" data-scene="2">🎅</div>
-      </div>
-      <div class="scene" id="scene3">
-        <div class="house" data-scene="3">🎁</div>
-      </div>
-      <div class="scene" id="scene4">
-        <div class="house" data-scene="4">⛄</div>
-      </div>
-      <div class="scene" id="scene5">
-        <div class="house" data-scene="5">🕯️</div>
-      </div>
-      <div class="scene" id="scene6">
-        <div class="house" data-scene="6">🌟</div>
-      </div>
-      <div class="scene" id="scene7">
-        <div class="house" data-scene="7">🎉</div>
-      </div>
-
-      <!-- Pause and Resume Buttons -->
+      <div class="scene" id="scene1"><div class="house" data-scene="1">🎄</div></div>
+      <div class="scene" id="scene2"><div class="house" data-scene="2">🎅</div></div>
+      <div class="scene" id="scene3"><div class="house" data-scene="3">🎁</div></div>
+      <div class="scene" id="scene4"><div class="house" data-scene="4">⛄</div></div>
+      <div class="scene" id="scene5"><div class="house" data-scene="5">🕯️</div></div>
+      <div class="scene" id="scene6"><div class="house" data-scene="6">🌟</div></div>
+      <div class="scene" id="scene7"><div class="house" data-scene="7">🎉</div></div>
       <button id="pause-game" class="control-btn">Pause</button>
       <button id="resume-game" class="control-btn hidden">Continue</button>
     </div>
@@ -171,9 +218,6 @@
       <button id="close-popup" onclick="closePopup()">Close</button>
       <p id="feedback"></p>
     </div>
-    
-    <!-- Instructions -->
-    <p id="instructions" class="hidden">Move through the village by answering trivia questions correctly!</p>
   </div>
 
   <script>
@@ -200,20 +244,17 @@
       { question: "How many reindeer does Santa have?", answer: "8" }
     ];
 
-    // Start the game
     document.getElementById('start-game').addEventListener('click', () => {
       if (selectedIcon) {
         startScreen.classList.add('hidden');
         scenesContainer.classList.remove('hidden');
         playerIcon.classList.remove('hidden');
         playerIcon.textContent = selectedIcon;
-        document.getElementById('instructions').classList.remove('hidden');
       } else {
         alert("Please select a player icon!");
       }
     });
 
-    // Select player icon
     document.querySelectorAll('.icon-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         selectedIcon = btn.getAttribute('data-icon');
@@ -221,7 +262,6 @@
       });
     });
 
-    // Pause and Resume functionality
     pauseButton.addEventListener('click', () => {
       scenesContainer.classList.add('hidden');
       triviaPopup.classList.add('hidden');
@@ -235,7 +275,6 @@
       pauseButton.classList.remove('hidden');
     });
 
-    // Trivia popup interaction
     function showTrivia(sceneNum) {
       const trivia = triviaQuestions[sceneNum - 1];
       triviaQuestionElem.textContent = trivia.question;
