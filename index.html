@@ -1,315 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Christmas Trivia Journey</title>
-  <style>
-    /* Base styles and reset */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f8ff;
-      color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
-    }
-    
-    /* Container and layout */
-    #game-container {
-      width: 100%;
-      max-width: 600px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 10px;
-    }
-    
-    /* Start screen and selection styling */
-    #start-screen {
-      animation: fadeIn 0.8s;
-    }
-    #icon-selection {
-      display: flex;
-      gap: 10px;
-      margin: 10px 0;
-      flex-wrap: wrap;
-    }
-    .icon-btn {
-      font-size: 1.8em;
-      padding: 10px;
-      cursor: pointer;
-      background: #e6f7ff;
-      border: 2px solid #333;
-      border-radius: 8px;
-      transition: transform 0.2s, background-color 0.2s;
-    }
-    .icon-btn:hover {
-      transform: scale(1.1);
-      background-color: #cceeff;
-    }
-    #start-game {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background-color: #ff8080;
-      color: white;
-      font-size: 1em;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    #start-game:hover {
-      background-color: #ff6666;
-    }
-    
-    /* Game scenes styling */
-    #scenes {
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      align-items: center;
-    }
-    .scene {
-      width: 80%;
-      max-width: 150px;
-      aspect-ratio: 1;
-      border-radius: 50%;
-      background: #e6f7ff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2.5rem;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
-      cursor: pointer;
-      transition: transform 0.3s, background-color 0.3s;
-    }
-    .scene:hover {
-      transform: scale(1.05);
-      background-color: #cceeff;
-    }
-    .house {
-      font-size: 1.8em;
-    }
-
-    /* Player icon display */
-    #player-icon {
-      font-size: 2rem;
-      position: fixed;
-      top: 5%;
-      right: 5%;
-      background-color: #ffefc1;
-      padding: 10px;
-      border-radius: 50%;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-      animation: bounce 1.5s infinite;
-    }
-
-    /* Trivia popup styling */
-    #trivia-popup {
-      background-color: #fff;
-      padding: 20px;
-      border: 2px solid #333;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 350px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      animation: fadeIn 0.8s;
-      display: none; /* Hidden by default */
-    }
-    #trivia-popup input, #submit-answer, #close-popup {
-      display: block;
-      width: 100%;
-      padding: 8px;
-      margin: 8px 0;
-      font-size: 1em;
-    }
-    #submit-answer {
-      background-color: #80d4ff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #submit-answer:hover {
-      background-color: #66c2ff;
-    }
-    #feedback {
-      margin-top: 10px;
-      font-size: 0.9em;
-      color: green;
-    }
-
-    /* Control buttons */
-    .control-btn {
-      padding: 10px 20px;
-      font-size: 1em;
-      cursor: pointer;
-      background-color: #ffcccc;
-      border: none;
-      border-radius: 5px;
-      margin: 5px;
-    }
-
-    /* Animation */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    /* Responsive design */
-    @media (max-width: 480px) {
-      #game-container { padding: 20px; }
-      #instructions { font-size: 0.9em; }
-      .icon-btn { font-size: 1.3em; padding: 8px; }
-      #player-icon { font-size: 1.8em; top: 10%; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Rosary Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            text-align: center;
+            overflow: hidden;
+        }
+        #rosary-container {
+            position: relative;
+            width: 420px;
+            height: 520px;
+            margin: 0 auto;
+            border-radius: 50%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            transform: rotate(-18deg);
+        }
+        .bead {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #666;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .bead.clicked {
+            background-color: #2196F3;
+            transform: scale(1.1);
+        }
+        .decade-separator {
+            background-color: #444;
+            width: 35px;
+            height: 35px;
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        #current-prayer, #activity {
+            font-size: 1.2em;
+            margin-top: 15px;
+        }
+        /* Cross styling */
+        .cross {
+            position: absolute;
+            width: 20px;
+            height: 60px;
+            background-color: #8b4513; /* Dark brown for the cross */
+            bottom: -90px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        .cross::before {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 15px;
+            background-color: #8b4513;
+            top: 20px;
+            left: -15px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-  <div id="game-container">
-    <!-- Start Screen -->
-    <div id="start-screen">
-      <h1>Christmas Trivia Journey</h1>
-      <p>Choose your player icon:</p>
-      <div id="icon-selection">
-        <button class="icon-btn" data-icon="🎄">Tree</button>
-        <button class="icon-btn" data-icon="🦌">Reindeer</button>
-        <button class="icon-btn" data-icon="🎅">Elf</button>
-        <button class="icon-btn" data-icon="🐿️">Chipmunk</button>
-      </div>
-      <button id="start-game">Start Game</button>
+    <h1>Enhanced Rosary Game</h1>
+    <p>Click on each bead to pray and complete activities.</p>
+
+    <div id="rosary-container"></div>
+
+    <div id="controls">
+        <button onclick="resetRosary()">Reset Rosary</button>
+        <button onclick="toggleBackgroundMusic()">Toggle Background Music</button>
     </div>
 
-    <!-- Game Scenes Container -->
-    <div id="scenes" class="hidden">
-      <div id="player-icon" class="player hidden"></div>
-      <div class="scene" id="scene1"><div class="house" data-scene="1">🎄</div></div>
-      <div class="scene" id="scene2"><div class="house" data-scene="2">🎅</div></div>
-      <div class="scene" id="scene3"><div class="house" data-scene="3">🎁</div></div>
-      <div class="scene" id="scene4"><div class="house" data-scene="4">⛄</div></div>
-      <div class="scene" id="scene5"><div class="house" data-scene="5">🕯️</div></div>
-      <div class="scene" id="scene6"><div class="house" data-scene="6">🌟</div></div>
-      <div class="scene" id="scene7"><div class="house" data-scene="7">🎉</div></div>
-      <button id="pause-game" class="control-btn">Pause</button>
-      <button id="resume-game" class="control-btn hidden">Continue</button>
-    </div>
-    
-    <!-- Trivia Popup -->
-    <div id="trivia-popup" class="hidden">
-      <h2>Trivia Question</h2>
-      <p id="trivia-question"></p>
-      <input type="text" id="trivia-answer" placeholder="Your answer...">
-      <button id="submit-answer">Submit</button>
-      <button id="close-popup" onclick="closePopup()">Close</button>
-      <p id="feedback"></p>
-    </div>
-  </div>
+    <div id="current-prayer">Click a bead to start</div>
+    <div id="activity">Activity: Ready to start?</div>
 
-  <script>
-    const startScreen = document.getElementById('start-screen');
-    const scenesContainer = document.getElementById('scenes');
-    const playerIcon = document.getElementById('player-icon');
-    const pauseButton = document.getElementById('pause-game');
-    const resumeButton = document.getElementById('resume-game');
-    const triviaPopup = document.getElementById('trivia-popup');
-    const triviaQuestionElem = document.getElementById('trivia-question');
-    const triviaAnswerInput = document.getElementById('trivia-answer');
-    const feedbackElem = document.getElementById('feedback');
-    let currentScene = 1;
-    let selectedIcon = "";
+    <!-- Audio files -->
+    <audio id="our-father" src="our_father.mp3"></audio>
+    <audio id="hail-mary" src="hail_mary.mp3"></audio>
+    <audio id="glory-be" src="glory_be.mp3"></audio>
+    <audio id="chime" src="chime.mp3"></audio>
+    <audio id="background-music" src="background_music.mp3" loop></audio>
 
-    // Trivia questions and answers
-    const triviaQuestions = [
-      { question: "What is Santa's favorite snack?", answer: "cookies" },
-      { question: "What do people put on top of a Christmas tree?", answer: "star" },
-      { question: "Which reindeer has a red nose?", answer: "rudolph" },
-      { question: "Name a common holiday drink.", answer: "eggnog" },
-      { question: "Which date is Christmas celebrated on?", answer: "25" },
-      { question: "What color is Santa's suit?", answer: "red" },
-      { question: "How many reindeer does Santa have?", answer: "8" }
-    ];
+    <script>
+        const prayers = [
+            { type: "Our Father", sound: "our-father" },
+            ...Array(10).fill({ type: "Hail Mary", sound: "hail-mary" }),
+            { type: "Glory Be", sound: "glory-be" }
+        ];
 
-    document.getElementById('start-game').addEventListener('click', () => {
-      if (selectedIcon) {
-        startScreen.classList.add('hidden');
-        scenesContainer.classList.remove('hidden');
-        playerIcon.classList.remove('hidden');
-        playerIcon.textContent = selectedIcon;
-      } else {
-        alert("Please select a player icon!");
-      }
-    });
+        const activities = [
+            "Reflect on the virtue of patience.",
+            "Pray for a loved one.",
+            "Think of one thing you're grateful for.",
+            "Say a silent prayer for peace.",
+            "Pray for those in need.",
+            "Focus on a personal goal.",
+            "Reflect on forgiveness.",
+            "Pray for strength.",
+            "Express a hope for the future.",
+            "Reflect on an act of kindness."
+        ];
 
-    document.querySelectorAll('.icon-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        selectedIcon = btn.getAttribute('data-icon');
-        playerIcon.textContent = selectedIcon;
-      });
-    });
+        let currentDecade = 0;
+        const totalDecades = 5;
+        let backgroundMusicPlaying = false;
 
-    pauseButton.addEventListener('click', () => {
-      scenesContainer.classList.add('hidden');
-      triviaPopup.classList.add('hidden');
-      pauseButton.classList.add('hidden');
-      resumeButton.classList.remove('hidden');
-    });
+        const rosaryContainer = document.getElementById("rosary-container");
+        const currentPrayerDisplay = document.getElementById("current-prayer");
+        const activityDisplay = document.getElementById("activity");
 
-    resumeButton.addEventListener('click', () => {
-      scenesContainer.classList.remove('hidden');
-      resumeButton.classList.add('hidden');
-      pauseButton.classList.remove('hidden');
-    });
+        function createRosary() {
+            const totalBeads = prayers.length * totalDecades;
+            const radius = 180;
 
-    // Event listener for each house in the current scene
-    document.querySelectorAll('.house').forEach(house => {
-      house.addEventListener('click', () => {
-        const sceneNum = parseInt(house.dataset.scene);
-        if (sceneNum === currentScene) {
-          showTrivia(sceneNum);
+            // Main rosary circle
+            for (let i = 0; i < totalBeads; i++) {
+                const bead = document.createElement("div");
+                bead.classList.add("bead");
+
+                // Larger size for decade separators
+                if (i % prayers.length === 0) {
+                    bead.classList.add("decade-separator");
+                }
+
+                // Calculate bead position
+                const angle = (i / totalBeads) * 2 * Math.PI;
+                const x = 210 + radius * Math.cos(angle);
+                const y = 210 + radius * Math.sin(angle);
+                bead.style.left = `${x}px`;
+                bead.style.top = `${y}px`;
+
+                bead.onclick = () => playPrayerAndActivity(i % prayers.length, bead);
+                rosaryContainer.appendChild(bead);
+            }
+
+            // Connector beads leading to the cross in a slight curve
+            const connectorBeadCount = 5;
+            const connectorYOffset = 50; // Distance between each connector bead
+            const curveRadius = 15; // Adjust for a slight curve
+
+            for (let j = 1; j <= connectorBeadCount; j++) {
+                const connectorBead = document.createElement("div");
+                connectorBead.classList.add("bead");
+                const angleOffset = (j - 3) * 0.1; // Creates slight curve
+                const x = 210 + curveRadius * Math.sin(angleOffset);
+                const y = 360 + j * connectorYOffset;
+                connectorBead.style.left = `${x}px`;
+                connectorBead.style.top = `${y}px`;
+                connectorBead.onclick = () => playPrayerAndActivity(j, connectorBead);
+                rosaryContainer.appendChild(connectorBead);
+            }
+
+            // Cross element
+            const cross = document.createElement("div");
+            cross.classList.add("cross");
+            rosaryContainer.appendChild(cross);
         }
-      });
-    });
 
-    function showTrivia(sceneNum) {
-      const trivia = triviaQuestions[sceneNum - 1];
-      triviaQuestionElem.textContent = trivia.question;
-      feedbackElem.textContent = "";
-      triviaPopup.classList.remove('hidden');
-    }
+        function playPrayerAndActivity(prayerIndex, bead) {
+            if (!bead.classList.contains("clicked")) {
+                bead.classList.add("clicked");
+                const prayer = prayers[prayerIndex] || { type: "Meditation", sound: "our-father" };
+                playSound(prayer.sound);
+                currentPrayerDisplay.textContent = `Praying: ${prayer.type}`;
+                
+                const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+                activityDisplay.textContent = `Activity: ${randomActivity}`;
 
-    document.getElementById('submit-answer').addEventListener('click', () => {
-      const answer = triviaAnswerInput.value.toLowerCase();
-      const correctAnswer = triviaQuestions[currentScene - 1].answer;
+                if (isDecadeComplete()) {
+                    currentDecade++;
+                    if (currentDecade < totalDecades) {
+                        playSound("chime");
+                        alert(`Decade ${currentDecade} complete!`);
+                    } else {
+                        alert("Rosary Complete! Well done!");
+                        resetRosary();
+                    }
+                }
+            }
+        }
 
-      if (answer === correctAnswer) {
-        feedbackElem.textContent = "Correct! Moving to the next scene.";
-        currentScene++;
-        triviaPopup.classList.add('hidden');
-        triviaAnswerInput.value = "";
-      } else {
-        feedbackElem.textContent = "Incorrect. Try again!";
-      }
-    });
+        function isDecadeComplete() {
+            const beads = rosaryContainer.querySelectorAll(".bead");
+            const start = currentDecade * prayers.length;
+            const end = start + prayers.length;
+            return Array.from(beads).slice(start, end).every(bead => bead.classList.contains("clicked"));
+        }
 
-    function closePopup() {
-      triviaPopup.classList.add('hidden');
-    }
-  </script>
+        function playSound(soundId) {
+            const audio = document.getElementById(soundId);
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play();
+            }
+        }
+
+        function resetRosary() {
+            document.querySelectorAll(".bead").forEach(bead => bead.classList.remove("clicked"));
+            currentDecade = 0;
+            currentPrayerDisplay.textContent = "Click a bead to start";
+            activityDisplay.textContent = "Activity: Ready to start?";
+        }
+
+        function toggleBackgroundMusic() {
+            const backgroundMusic = document.getElementById("background-music");
+            if (backgroundMusicPlaying) {
+                backgroundMusic.pause();
+                backgroundMusicPlaying = false;
+            } else {
+                backgroundMusic.play();
+                backgroundMusicPlaying = true;
+            }
+        }
+
+        createRosary();
+    </script>
 </body>
 </html>
