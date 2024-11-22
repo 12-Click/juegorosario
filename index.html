@@ -3,237 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Rosary Game</title>
+    <link rel="shortcut icon" href="images/Logo.png">
+    <title>12Click - Member Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f4f8;
-            text-align: center;
-            overflow: hidden;
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        #rosary-container {
-            position: relative;
-            width: 420px;
-            height: 520px;
-            margin: 0 auto;
-            border-radius: 50%;
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #007bff, #00aaff);
+            color: #333;
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
             align-items: center;
-            transform: rotate(-18deg);
+            height: 100vh;
+            padding: 20px;
         }
-        .bead {
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            line-height: 1.4;
+        }
+
+        .logo {
+            max-width: 100px;
+            margin-bottom: 20px;
+        }
+
+        .input-icon {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .input-icon i {
             position: absolute;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: #666;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #007bff;
+        }
+
+        .input-icon input {
+            width: 100%;
+            padding: 14px 15px 14px 40px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            background: linear-gradient(135deg, #f0f8ff, #e0f7ff);
+            transition: all 0.3s ease;
+        }
+
+        .input-icon input::placeholder {
+            color: #aaa;
+        }
+
+        .input-icon input:focus {
+            border-color: #007bff;
+            background: linear-gradient(135deg, #e0f7ff, #d1f1ff);
+            box-shadow: 0px 4px 8px rgba(0, 123, 255, 0.2);
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            font-size: 1.1rem;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-weight: 600;
         }
-        .bead.clicked {
-            background-color: #2196F3;
-            transform: scale(1.1);
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
         }
-        .decade-separator {
-            background-color: #444;
-            width: 35px;
-            height: 35px;
-        }
-        #controls {
+
+        .footer {
             margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
         }
-        #current-prayer, #activity {
-            font-size: 1.2em;
-            margin-top: 15px;
+
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
         }
-        /* Cross styling */
-        .cross {
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .spinner {
+            display: none;
             position: absolute;
-            width: 20px;
-            height: 60px;
-            background-color: #8b4513; /* Dark brown for the cross */
-            bottom: -90px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            border-radius: 5px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-        }
-        .cross::before {
-            content: '';
-            position: absolute;
-            width: 50px;
-            height: 15px;
-            background-color: #8b4513;
-            top: 20px;
-            left: -15px;
-            border-radius: 5px;
-        }
-        /* Additional styling for the vertical beads */
-        .vertical-bead {
-            width: 25px;
-            height: 25px;
-            background-color: #666;
-            position: absolute;
+            transform: translate(-50%, -50%);
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
             border-radius: 50%;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <h1>Enhanced Rosary Game</h1>
-    <p>Click on each bead to pray and complete activities.</p>
-
-    <div id="rosary-container"></div>
-
-    <div id="controls">
-        <button onclick="resetRosary()">Reset Rosary</button>
-        <button onclick="toggleBackgroundMusic()">Toggle Background Music</button>
+    <div class="container">
+        <img src="images/barlogo.png" alt="12Click Logo" class="logo">
+        <h2>Member Login</h2>
+        <form id="loginForm">
+            <div class="input-icon">
+                <i class="fas fa-user"></i>
+                <input type="text" id="userId" placeholder="User ID" required>
+            </div>
+            <div class="input-icon">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
+            <div class="error-message" id="errorContainer"></div>
+            <button type="submit">Login</button>
+        </form>
+        <div class="footer">
+            <p><a href="/forgot-password.html">Forgot your password?</a></p>
+        </div>
+        <div class="spinner" id="loadingSpinner"></div>
     </div>
 
-    <div id="current-prayer">Click a bead to start</div>
-    <div id="activity">Activity: Ready to start?</div>
-
-    <!-- Audio files -->
-    <audio id="our-father" src="our_father.mp3"></audio>
-    <audio id="hail-mary" src="hail_mary.mp3"></audio>
-    <audio id="glory-be" src="glory_be.mp3"></audio>
-    <audio id="chime" src="chime.mp3"></audio>
-    <audio id="background-music" src="background_music.mp3" loop></audio>
-
     <script>
-        const prayers = [
-            { type: "Our Father", sound: "our-father" },
-            ...Array(9).fill({ type: "Hail Mary", sound: "hail-mary" }),
-            { type: "Glory Be", sound: "glory-be" }
-        ];
+        const API_URL = 'https://ua6lvbnawe.execute-api.us-east-1.amazonaws.com/12ClickProd';
 
-        const activities = [
-            "Reflect on the virtue of patience.",
-            "Pray for a loved one.",
-            "Think of one thing you're grateful for.",
-            "Say a silent prayer for peace.",
-            "Pray for those in need.",
-            "Focus on a personal goal.",
-            "Reflect on forgiveness.",
-            "Pray for strength.",
-            "Express a hope for the future.",
-            "Reflect on an act of kindness."
-        ];
+        const spinner = document.getElementById('loadingSpinner');
+        const loginForm = document.getElementById('loginForm');
+        const errorContainer = document.getElementById('errorContainer');
 
-        let currentDecade = 0;
-        const totalDecades = 5;
-        let backgroundMusicPlaying = false;
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
 
-        const rosaryContainer = document.getElementById("rosary-container");
-        const currentPrayerDisplay = document.getElementById("current-prayer");
-        const activityDisplay = document.getElementById("activity");
+            // Show spinner and reset error message
+            spinner.style.display = 'block';
+            errorContainer.textContent = '';
 
-        function createRosary() {
-            const totalBeads = prayers.length * totalDecades;
-            const radius = 180;
+            const userId = document.getElementById('userId').value.trim();
+            const password = document.getElementById('password').value.trim();
 
-            // Main rosary circle
-            for (let i = 0; i < totalBeads; i++) {
-                const bead = document.createElement("div");
-                bead.classList.add("bead");
+            if (!userId || !password) {
+                spinner.style.display = 'none';
+                errorContainer.textContent = 'Please fill in all fields.';
+                return;
+            }
 
-                // Larger size for decade separators
-                if (i % prayers.length === 0) {
-                    bead.classList.add("decade-separator");
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, password }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Login failed.');
                 }
 
-                // Calculate bead position
-                const angle = (i / totalBeads) * 2 * Math.PI;
-                const x = 210 + radius * Math.cos(angle);
-                const y = 210 + radius * Math.sin(angle);
-                bead.style.left = `${x}px`;
-                bead.style.top = `${y}px`;
+                const data = await response.json();
 
-                bead.onclick = () => playPrayerAndActivity(i % prayers.length, bead);
-                rosaryContainer.appendChild(bead);
-            }
-
-            // Vertical beads leading to the cross
-            const connectorBeadCount = 5;
-            const verticalBeadYOffset = 35; // Distance between each vertical bead
-            const crossOffsetY = -80; // Offset for the cross from the last bead
-
-            for (let j = 0; j < connectorBeadCount; j++) {
-                const verticalBead = document.createElement("div");
-                verticalBead.classList.add("vertical-bead");
-                verticalBead.style.left = "50%"; // Center it horizontally
-                verticalBead.style.top = `${350 + j * verticalBeadYOffset}px`; // Space them vertically
-                verticalBead.onclick = () => playPrayerAndActivity(j + 10, verticalBead);
-                rosaryContainer.appendChild(verticalBead);
-            }
-
-            // Cross element
-            const cross = document.createElement("div");
-            cross.classList.add("cross");
-            cross.style.top = `${350 + connectorBeadCount * verticalBeadYOffset + crossOffsetY}px`; // Position the cross
-            rosaryContainer.appendChild(cross);
-        }
-
-        function playPrayerAndActivity(prayerIndex, bead) {
-            if (!bead.classList.contains("clicked")) {
-                bead.classList.add("clicked");
-                const prayer = prayers[prayerIndex] || { type: "Meditation", sound: "our-father" };
-                playSound(prayer.sound);
-                currentPrayerDisplay.textContent = `Praying: ${prayer.type}`;
-                
-                const randomActivity = activities[Math.floor(Math.random() * activities.length)];
-                activityDisplay.textContent = `Activity: ${randomActivity}`;
-
-                if (isDecadeComplete()) {
-                    currentDecade++;
-                    if (currentDecade < totalDecades) {
-                        playSound("chime");
-                        alert(`Decade ${currentDecade} complete!`);
-                    } else {
-                        alert("Rosary Complete! Well done!");
-                        resetRosary();
-                    }
+                sessionStorage.setItem('token', data.token);
+                if (data.role === 'admin') {
+                    window.location.href = '/admin-dashboard.html';
+                } else {
+                    window.location.href = '/dashboard.html';
                 }
+            } catch (error) {
+                console.error('Login error:', error.message);
+                errorContainer.textContent = error.message || 'An error occurred. Please try again.';
+            } finally {
+                spinner.style.display = 'none';
             }
-        }
-
-        function isDecadeComplete() {
-            const beads = rosaryContainer.querySelectorAll(".bead");
-            const start = currentDecade * prayers.length;
-            const end = start + prayers.length;
-            return Array.from(beads).slice(start, end).every(bead => bead.classList.contains("clicked"));
-        }
-
-        function playSound(soundId) {
-            const audio = document.getElementById(soundId);
-            if (audio) {
-                audio.currentTime = 0;
-                audio.play();
-            }
-        }
-
-        function resetRosary() {
-            document.querySelectorAll(".bead").forEach(bead => bead.classList.remove("clicked"));
-            currentDecade = 0;
-            currentPrayerDisplay.textContent = "Click a bead to start";
-            activityDisplay.textContent = "Activity: Ready to start?";
-        }
-
-        function toggleBackgroundMusic() {
-            const backgroundMusic = document.getElementById("background-music");
-            if (backgroundMusicPlaying) {
-                backgroundMusic.pause();
-                backgroundMusicPlaying = false;
-            } else {
-                backgroundMusic.play();
-                backgroundMusicPlaying = true;
-            }
-        }
-
-        createRosary();
+        });
     </script>
 </body>
 </html>
