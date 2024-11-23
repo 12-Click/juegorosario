@@ -39,6 +39,14 @@
         button:hover {
             background-color: #0056b3;
         }
+        #userOutput {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -81,6 +89,24 @@
             <button type="submit">Update Order Status</button>
         </form>
 
+        <!-- Delete User Form -->
+        <form id="deleteUserForm">
+            <input type="text" id="deleteUserId" placeholder="Enter User ID to Delete" required>
+            <button type="submit">Delete User</button>
+        </form>
+
+        <!-- Track Usage Form -->
+        <form id="trackUsageForm">
+            <input type="text" id="usageUserId" placeholder="Enter User ID" required>
+            <select id="resourceType">
+                <option value="paginasWeb">Paginas Web</option>
+                <option value="catalogos">Catalogos</option>
+                <option value="anunciosAR">Anuncios AR</option>
+                <option value="selfies">Selfies</option>
+            </select>
+            <button type="submit">Track Usage</button>
+        </form>
+
         <div id="userOutput"></div>
     </div>
 
@@ -102,7 +128,7 @@
             const password = document.getElementById('password').value;
             const membershipLevel = document.getElementById('membershipLevel').value;
             const response = await fetchAPI('https://your-api-url.com/addUser', 'POST', { userId, password, membershipLevel });
-            alert(response.message);
+            document.getElementById('userOutput').innerText = JSON.stringify(response, null, 2);
         });
 
         document.getElementById('getUserForm').addEventListener('submit', async (e) => {
@@ -118,7 +144,7 @@
             const userId = document.getElementById('updateUserId').value;
             const membershipLevel = document.getElementById('newMembershipLevel').value;
             const response = await fetchAPI('https://your-api-url.com/updateMembership', 'PUT', { userId, membershipLevel });
-            alert('Membership updated!');
+            document.getElementById('userOutput').innerText = JSON.stringify(response, null, 2);
         });
 
         document.getElementById('updateOrderStatusForm').addEventListener('submit', async (e) => {
@@ -126,7 +152,24 @@
             const userId = document.getElementById('orderUserId').value;
             const orderStatus = document.getElementById('orderStatus').value;
             const response = await fetchAPI('https://your-api-url.com/updateOrderStatus', 'PUT', { userId, orderStatus });
-            alert('Order status updated!');
+            document.getElementById('userOutput').innerText = JSON.stringify(response, null, 2);
+        });
+
+        // Delete User
+        document.getElementById('deleteUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('deleteUserId').value;
+            const response = await fetchAPI('https://your-api-url.com/deleteUser', 'DELETE', { userId });
+            document.getElementById('userOutput').innerText = JSON.stringify(response, null, 2);
+        });
+
+        // Track Usage
+        document.getElementById('trackUsageForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('usageUserId').value;
+            const resourceType = document.getElementById('resourceType').value;
+            const response = await fetchAPI('https://your-api-url.com/trackUsage', 'PUT', { userId, resourceType });
+            document.getElementById('userOutput').innerText = JSON.stringify(response, null, 2);
         });
     </script>
 </body>
