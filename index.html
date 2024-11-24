@@ -67,6 +67,9 @@
     <div id="dashboard">
         <h1>Admin Dashboard</h1>
 
+        <!-- Logout Button -->
+        <button id="logoutButton">Logout</button>
+
         <!-- Add User Form -->
         <form id="addUserForm">
             <input type="text" id="userId" placeholder="User ID" required>
@@ -135,11 +138,26 @@
     </div>
 
     <script>
+        // Protect Page Access
+        const authToken = sessionStorage.getItem('authToken');
+        if (!authToken) {
+            window.location.href = 'login.html';
+        }
+
+        // Log Out User
+        document.getElementById('logoutButton').addEventListener('click', () => {
+            sessionStorage.removeItem('authToken'); // Remove the auth token
+            window.location.href = 'login.html'; // Redirect to login page
+        });
+
         // Enhanced Fetch API with Error Handling and Loading Indicator
         async function fetchAPI(url, method, body = null) {
             const options = {
                 method,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}` // Include token
+                }
             };
             if (body) options.body = JSON.stringify(body);
 
@@ -251,7 +269,7 @@
                 document.getElementById('userOutput').innerText = response.error;
                 document.getElementById('userOutput').classList.add('error');
             } else {
-                document.getElementById('userOutput').innerText = `Usage for ${resourceType} updated successfully!`;
+                document.getElementById('userOutput').innerText = 'Usage tracked successfully!';
                 document.getElementById('userOutput').classList.add('success');
             }
         });
